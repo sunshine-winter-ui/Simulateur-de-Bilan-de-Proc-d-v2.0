@@ -329,7 +329,7 @@ def landing_page():
     
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
     # Image par lien direct représentant la simulation de procédés industriels
-    st.image("image_0c90fd.jpg", caption="Simulation de procédés industriels & Contrôle Qualité", use_container_width=True)
+    st.image("https://imgs.search.brave.com/vwQQ790gGIuoqkluFnyVmjw53FozAhtKow4OAqHM22s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly93d3cu/YXBwbGllZGNheC5j/b20vd3AtY29udGVu/dC91cGxvYWRzL1By/b2Nlc3N0U0lNX0hl/cm8tbWluLmpwZw", caption="Simulation de procédés industriels & Contrôle Qualité", use_container_width=True)
     st.markdown("<div style='text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 1rem;'>Simulateur Pro V2 • Conçu pour les étudiants en génie des procédés</div>", unsafe_allow_html=True)
 
 # --- 2. AUTH ---
