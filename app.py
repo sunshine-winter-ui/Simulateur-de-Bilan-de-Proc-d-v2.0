@@ -81,7 +81,7 @@ def t(k): return TRANSLATIONS[st.session_state.lang].get(k,k)
 
 if 'theme_mode' not in st.session_state: st.session_state.theme_mode='light'
 if 'lang' not in st.session_state: st.session_state.lang='FR'
-if 'page' not in st.session_state: st.session_state.page='landing'  # landing / auth / app
+if 'page' not in st.session_state: st.session_state.page='landing'
 if 'logged_in' not in st.session_state: st.session_state.logged_in=False
 
 # --- DB ---
@@ -137,7 +137,6 @@ st.markdown(f"""
     section[data-testid="stSidebar"] {{ background:{CARD_SOLID} !important; }}
     #MainMenu {{visibility:hidden;}} header {{background:transparent !important;}}
 
-    /* 📱 MOBILE : tout s'adapte */
     @media (max-width: 768px) {{
         .hero {{ padding:20px 16px !important; border-radius:18px !important; }}
         .hero h1 {{ font-size:24px !important; line-height:1.2 !important; }}
@@ -167,7 +166,6 @@ def create_pdf_report(params, results, conclusions, username):
         from reportlab.pdfgen import canvas
         from reportlab.lib.units import mm
         buf = BytesIO(); c = canvas.Canvas(buf, pagesize=A4); w,h = A4
-        # Header
         c.setFillColorRGB(0.48,0.23,0.92); c.rect(0,h-55,w,55,fill=1,stroke=0)
         c.setFillColorRGB(1,1,1); c.setFont("Helvetica-Bold",20); c.drawString(20*mm,h-32,"SIMULATEUR PRO - Rapport")
         c.setFont("Helvetica",10); c.drawString(20*mm,h-45,f"Utilisateur: {username}  |  Filtration - Chauffage - Evaporation")
@@ -180,15 +178,13 @@ def create_pdf_report(params, results, conclusions, username):
         y-=8; c.setFont("Helvetica-Bold",14); c.drawString(20*mm,y,"3. Conclusion"); y-=18; c.setFont("Helvetica",11)
         for concl in conclusions:
             txt = re.sub(r'[^a-zA-Z0-9 .,%:()/-]','', concl)
-            # wrap simple
             while len(txt)>85:
                 c.drawString(25*mm,y,txt[:85]); y-=14; txt=txt[85:]
             c.drawString(25*mm,y,txt); y-=16
             if y<40: c.showPage(); y=h-40
         c.setFont("Helvetica-Oblique",9); c.drawString(20*mm,20,"Genere par Simulateur Pro - Merci d'utiliser l'application.")
         c.save(); buf.seek(0); return buf.getvalue()
-    except Exception as e:
-        # Fallback TXT si reportlab absent
+    except Exception:
         txt = f"SIMULATEUR PRO\nUtilisateur: {username}\n\nPARAMETRES:\n{params}\n\nRESULTATS:\n{results}\n\nCONCLUSION:\n{conclusions}"
         return txt.encode('utf-8')
 
@@ -212,7 +208,7 @@ def generate_bot_response(q):
     return "Essaie : 'C'est quoi Q4 ?', 'Pourquoi mon bilan est faux ?', 'Où changer T3 ?'" if lang=='FR' else "Try: 'What is Q4?'"
 
 def generate_conclusion(m1,m2,m4,mv,Q3,Q4,Q5,x2,x4,erreur):
-    lang=st.session_state.lang; out=[]
+    out=[]
     out.append(f"⚠️ Bilan déséquilibré : Erreur {erreur:.2f} kg/h." if abs(erreur)>1 else "✅ Bilan équilibré : Entrées = Sorties.")
     taux=(x2/x4*100) if x4>0 else 0
     if taux<95: out.append(f"🔴 Concentration insuffisante : {x2*100:.1f}% au lieu de {x4*100:.0f}%. Augmente l'évaporation.")
@@ -232,8 +228,7 @@ def landing_page():
         if st.button(t("theme_btn")): st.session_state.theme_mode='dark' if not is_dark else 'light'; st.rerun()
     st.markdown(get_logo(300,100), unsafe_allow_html=True)
     st.markdown(f"<p style='text-align:center; font-weight:700; color:{MUTED};'>{t('app_subtitle')}</p>", unsafe_allow_html=True)
-    # HERO
-    st.markdown(f"""<div class="hero"><span class="hero-badge">✨ NOUVEAU • V3 • GRATUIT</span>
+    st.markdown(f"""<div class="hero"><span class="hero-badge">✨ NOUVEAU • V2 • GRATUIT</span>
     <h1 style="font-size:36px; margin:14px 0 8px 0; line-height:1.1;">{t('landing_title')}</h1>
     <p style="font-size:16px; opacity:0.95; margin:0;">{t('landing_sub')}</p>
     <div style="margin-top:16px;"><span class="hero-badge">🧪 Filtration</span> <span class="hero-badge">🔥 Chauffage</span> <span class="hero-badge">💨 Évaporation</span></div></div>""", unsafe_allow_html=True)
@@ -244,7 +239,6 @@ def landing_page():
     with c2:
         if st.button(t("cta_login"), use_container_width=True): st.session_state.page='auth'; st.rerun()
     st.write("")
-    # FEATURES - 2x2 sur mobile, 4 en ligne sur PC
     f1,f2,f3,f4 = st.columns(4)
     with f1: st.markdown(f"<div class='feature'><h3>{t('feat1')}</h3><p>{t('feat1_d')}</p></div>", unsafe_allow_html=True)
     with f2: st.markdown(f"<div class='feature'><h3>{t('feat2')}</h3><p>{t('feat2_d')}</p></div>", unsafe_allow_html=True)
@@ -307,7 +301,7 @@ def simulator_page():
             if st.button(t("theme_btn")): st.session_state.theme_mode='dark' if not is_dark else 'light'; st.rerun()
         st.info(t("info_msg"))
         if st.button(t("logout")): st.session_state.logged_in=False; st.session_state.messages=[]; st.session_state.page='landing'; st.rerun()
-    st.markdown(f"""<div class="hero"><span class="hero-badge">✨ SIMULATEUR • V3</span><h1 style="margin:10px 0 6px 0;">{t('sim_title')}</h1><p style="opacity:0.9; margin:0;">{t('sim_caption')}</p></div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="hero"><span class="hero-badge">✨ SIMULATEUR • V2</span><h1 style="margin:10px 0 6px 0;">{t('sim_title')}</h1><p style="opacity:0.9; margin:0;">{t('sim_caption')}</p></div>""", unsafe_allow_html=True)
     tab_params, tab_results, tab_conclusion, tab_chat = st.tabs([t("tab_params"), t("tab_results"), t("tab_conclusion"), t("tab_chat")])
     with tab_params:
         st.markdown('<div class="glass">', unsafe_allow_html=True)
@@ -340,7 +334,6 @@ def simulator_page():
         if abs(erreur)<=1 and x2>=p['x4']: st.success(f"✅ {t('summary')} : " + ("Le procédé est valide." if st.session_state.lang=='FR' else "Process is valid."))
         else: st.warning(f"⚠️ {t('summary')} : " + ("Corrigez les points ci-dessus." if st.session_state.lang=='FR' else "Fix points above."))
         st.write("")
-        # EXPORT PDF
         params_dict = {"m0":f"{p['m0']} kg/h","x0":p['x0_sol'],"residus":f"{p['residus']} kg/h","mR":f"{p['mR']} kg/h","xR":p['xR'],"T2":f"{p['T2']} C","T3":f"{p['T3']} C","Cp":p['cp'],"x4":p['x4'],"lambda":p['lambda_v']}
         results_dict = {"m1":f"{m1:.2f} kg/h","m2":f"{m2:.2f} kg/h","x2":f"{x2*100:.2f} %","m4":f"{m4:.2f} kg/h","mv":f"{mv:.2f} kg/h","Q3":f"{Q3:.2f} kW","Q4":f"{Q4:.2f} kW","Q5":f"{Q5:.2f} kW","erreur":f"{erreur:.2f} kg/h"}
         pdf_bytes = create_pdf_report(params_dict, results_dict, concls, st.session_state.get('username','Utilisateur'))
