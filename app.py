@@ -176,6 +176,27 @@ def generate_bot_response(user_input):
 
 # --- 6. SIMULATEUR + GRAPHIQUES + CHATBOT ---
 def simulator_page():
+    import streamlit as st
+
+   # --- SÉLECTEUR DE THÈME  ---
+  with st.sidebar:
+    st.subheader("🎨 Apparence")
+    theme_choice = st.radio(
+        "Choisir le thème :",
+        ("Clair", "Sombre"),
+        index=0 if st.session_state.get('theme_mode', 'light') == 'light' else 1
+    )
+    if theme_choice == "Clair" and st.session_state.get('theme_mode') != 'light':
+        st._config.set_option('theme.base', 'light')
+        st.session_state['theme_mode'] = 'light'
+        st.rerun()
+    elif theme_choice == "Sombre" and st.session_state.get('theme_mode') != 'dark':
+        st._config.set_option('theme.base', 'dark')
+        st.session_state['theme_mode'] = 'dark'
+        st.rerun()
+    # ... à l'intérieur de simulator_page() ...
+    st.title("🧪 Simulateur de Bilan de Procédé")
+
     # En-tête avec le nom de l'utilisateur
     st.title("🧪 Simulateur de Bilan de Procédé")
     st.markdown(f"Bienvenue **{st.session_state.get('username', 'Utilisateur')}** ! Ajustez les paramètres pour voir les résultats évoluer.")
