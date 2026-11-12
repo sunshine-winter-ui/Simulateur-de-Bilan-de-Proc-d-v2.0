@@ -104,7 +104,7 @@ def authenticate_user(e,p):
     conn=sqlite3.connect('users.db'); c=conn.cursor(); c.execute("SELECT username,password_hash FROM users WHERE email=?", (e,)); r=c.fetchone(); conn.close()
     return r[0] if r and verify_password(p,r[1]) else None
 
-# --- DESIGN & CORRECTION DU BUG D'AFFICHAGE DU TITRE ---
+# --- DESIGN ---
 is_dark = st.session_state.theme_mode=='dark'
 if is_dark:
     BG="#0b1023"; CARD="rgba(255,255,255,0.06)"; CARD_SOLID="#1a213f"; TEXT="#f8fafc"; MUTED="#a5b4fc"
