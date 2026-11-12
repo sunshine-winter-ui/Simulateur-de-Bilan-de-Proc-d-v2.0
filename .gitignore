@@ -1,0 +1,17 @@
+# Base de données locale
+users.db
+
+# Fichiers Python
+__pycache__/
+*.pyc
+
+# Environnements virtuels
+.venv/
+env/
+
+# Configuration locale
+.streamlit/secrets.toml
+
+# Système d'exploitation (Mac/Windows)
+.DS_Store
+Thumbs.db
