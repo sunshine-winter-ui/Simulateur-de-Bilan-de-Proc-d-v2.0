@@ -2,7 +2,7 @@ import streamlit as st
 import sqlite3, bcrypt, re, pandas as pd, unicodedata
 from io import BytesIO
 
-st.set_page_config(page_title="Simulateur Pro", layout="wide", page_icon="🧪", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Simulateur Pro V2", layout="wide", page_icon="🧪", initial_sidebar_state="collapsed")
 
 # --- TRADUCTION ---
 TRANSLATIONS = {
@@ -25,7 +25,7 @@ TRANSLATIONS = {
         "metric_Q4": "Puissance évaporation", "metric_Q5": "Puissance refroidissement", "metric_err": "Erreur bilan",
         "graphs": "📈 Graphiques", "obj_reach": "**Atteinte de l'objectif**", "obj_text": "Objectif",
         "concl_title": "📝 Conclusion & Recommandations", "summary": "En résumé",
-        "chat_title": "🤖 Assistant Virtuel", "chat_placeholder": "Posez votre question...",
+        "chat_title": "🤖 Assistant Virtuel", "chat_placeholder": "Posez votre question sur la simulation...",
         "err_fill": "Veuillez remplir tous les champs.", "err_auth": "Email ou mot de passe incorrect.",
         "err_req": "Tous les champs sont obligatoires.", "err_email": "Email invalide.", "err_pass": "Mots de passe différents.",
         "err_len": "Min. 8 caractères.", "err_exist": "Email déjà utilisé.", "succ_create": "Compte créé !", "err_create": "Erreur création.",
@@ -60,7 +60,7 @@ TRANSLATIONS = {
         "metric_Q4": "Evaporation power", "metric_Q5": "Cooling power", "metric_err": "Balance error",
         "graphs": "📈 Graphs", "obj_reach": "**Objective Achievement**", "obj_text": "Target",
         "concl_title": "📝 Conclusion & Recommendations", "summary": "In summary",
-        "chat_title": "🤖 Virtual Assistant", "chat_placeholder": "Ask your question...",
+        "chat_title": "🤖 Virtual Assistant", "chat_placeholder": "Ask your question about the simulation...",
         "err_fill": "Please fill all fields.", "err_auth": "Incorrect email or password.",
         "err_req": "All fields are required.", "err_email": "Invalid email.", "err_pass": "Passwords do not match.",
         "err_len": "Min. 8 characters.", "err_exist": "Email already used.", "succ_create": "Account created!", "err_create": "Creation error.",
@@ -104,7 +104,7 @@ def authenticate_user(e,p):
     conn=sqlite3.connect('users.db'); c=conn.cursor(); c.execute("SELECT username,password_hash FROM users WHERE email=?", (e,)); r=c.fetchone(); conn.close()
     return r[0] if r and verify_password(p,r[1]) else None
 
-# --- DESIGN ---
+# --- DESIGN & CORRECTION DU BUG DU TITRE ---
 is_dark = st.session_state.theme_mode=='dark'
 if is_dark:
     BG="#0b1023"; CARD="rgba(255,255,255,0.06)"; CARD_SOLID="#1a213f"; TEXT="#f8fafc"; MUTED="#a5b4fc"
@@ -139,7 +139,6 @@ st.markdown(f"""
     #MainMenu {{visibility:hidden;}} header {{background:transparent !important;}}
     .block-container {{ padding-top: 2rem; padding-bottom: 3rem; max-width: 1200px; }}
 
-    /* CORRECTION DÉFINITIVE DU BUG D'AFFICHAGE DU TITRE DÉGRADÉ */
     .gradient-title {{
         font-family: Arial, sans-serif;
         font-size: 28px;
@@ -150,17 +149,6 @@ st.markdown(f"""
         -webkit-text-fill-color: transparent;
         color: transparent;
         display: inline-block;
-    }}
-
-    @media (max-width: 768px) {{
-        .hero {{ padding:20px 16px !important; border-radius:18px !important; }}
-        .hero h1 {{ font-size:24px !important; line-height:1.2 !important; }}
-        .glass {{ padding:14px !important; border-radius:16px !important; }}
-        .feature {{ padding:12px !important; }}
-        div[data-testid="stMetricValue"] {{ font-size:20px !important; }}
-        div[data-testid="stMetric"] {{ padding:12px !important; }}
-        .stButton>button {{ padding:10px !important; font-size:13px !important; }}
-        h1 {{ font-size:24px !important; }} h2 {{ font-size:19px !important; }} h3 {{ font-size:16px !important; }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -186,7 +174,7 @@ def get_logo(w=260, h=70):
         <span style="font-family:Arial, sans-serif; font-size:16px; font-weight:800; color:{MUTED}; letter-spacing:5px;">PRO V2</span>
     </div></div>"""
 
-# --- EXPORT PDF STYLÉ & PROFESSIONNEL ---
+# --- EXPORT PDF PROFESSIONNEL & AMÉLIORÉ ---
 def create_pdf_report(params, results, conclusions, username):
     try:
         from reportlab.lib.pagesizes import A4
@@ -196,41 +184,52 @@ def create_pdf_report(params, results, conclusions, username):
         
         buf = BytesIO(); c = canvas.Canvas(buf, pagesize=A4); w, h = A4
         
+        # En-tête design haut de page
         c.setFillColor(colors.HexColor("#7c3aed"))
-        c.rect(0, h - 70, w, 70, fill=1, stroke=0)
+        c.rect(0, h - 75, w, 75, fill=1, stroke=0)
         c.setFillColor(colors.white)
-        c.setFont("Helvetica-Bold", 22)
-        c.drawString(20 * mm, h - 32, "SIMULATEUR PRO - RAPPORT D'INGÉNIERIE")
-        c.setFont("Helvetica", 11)
+        c.setFont("Helvetica-Bold", 20)
+        c.drawString(20 * mm, h - 30, "SIMULATEUR PRO V2 - RAPPORT D'INGÉNIERIE")
+        c.setFont("Helvetica", 10)
         c.drawString(20 * mm, h - 50, f"Opérateur: {username}  |  Module : Filtration • Chauffage • Évaporation")
+        c.drawString(20 * mm, h - 62, "Faculté des Sciences et Techniques - Génie des Procédés")
         
-        y = h - 90
+        y = h - 100
         c.setFillColor(colors.HexColor("#1e1b4b"))
         
-        c.setFont("Helvetica-Bold", 13)
+        # Section 1 : Paramètres
+        c.setFont("Helvetica-Bold", 12)
+        c.setFillColor(colors.HexColor("#7c3aed"))
         c.drawString(20 * mm, y, "1. Paramètres d'entrée du Procédé")
-        y -= 18
+        y -= 16
         c.setFont("Helvetica", 10)
+        c.setFillColor(colors.HexColor("#1e1b4b"))
         for k, v in params.items():
             c.drawString(25 * mm, y, f"• {k} : {v}")
             y -= 14
             if y < 50: c.showPage(); y = h - 40
             
-        y -= 6
-        c.setFont("Helvetica-Bold", 13)
+        y -= 10
+        # Section 2 : Résultats
+        c.setFont("Helvetica-Bold", 12)
+        c.setFillColor(colors.HexColor("#7c3aed"))
         c.drawString(20 * mm, y, "2. Résultats des Bilans Matière et Énergétique")
-        y -= 18
+        y -= 16
         c.setFont("Helvetica", 10)
+        c.setFillColor(colors.HexColor("#1e1b4b"))
         for k, v in results.items():
             c.drawString(25 * mm, y, f"• {k} : {v}")
             y -= 14
             if y < 50: c.showPage(); y = h - 40
             
-        y -= 6
-        c.setFont("Helvetica-Bold", 13)
+        y -= 10
+        # Section 3 : Conclusions
+        c.setFont("Helvetica-Bold", 12)
+        c.setFillColor(colors.HexColor("#7c3aed"))
         c.drawString(20 * mm, y, "3. Conclusions & Recommandations Techniques")
-        y -= 18
+        y -= 16
         c.setFont("Helvetica", 10)
+        c.setFillColor(colors.HexColor("#1e1b4b"))
         for concl in conclusions:
             txt = re.sub(r'[^a-zA-Z0-9 .,%:()/-]','', concl)
             while len(txt) > 85:
@@ -242,6 +241,7 @@ def create_pdf_report(params, results, conclusions, username):
             y -= 16
             if y < 50: c.showPage(); y = h - 40
             
+        # Pied de page PDF
         c.setFont("Helvetica-Oblique", 8)
         c.setFillColor(colors.HexColor("#6366f1"))
         c.drawString(20 * mm, 15, "Généré automatiquement par Simulateur Pro V2 • Usage académique et industriel.")
@@ -250,7 +250,7 @@ def create_pdf_report(params, results, conclusions, username):
         txt = f"SIMULATEUR PRO V2\nUtilisateur: {username}\n\nPARAMETRES:\n{params}\n\nRESULTATS:\n{results}\n\nCONCLUSION:\n{conclusions}"
         return txt.encode('utf-8')
 
-# --- CHATBOT ---
+# --- CHATBOT AMÉLIORÉ ---
 def clean_text(t):
     t=t.lower(); t=''.join(c for c in unicodedata.normalize('NFD',t) if unicodedata.category(c)!='Mn'); t=re.sub(r"[^a-z0-9\s]"," ",t); return re.sub(r"\s+"," ",t)
 
@@ -260,26 +260,31 @@ def generate_bot_response(q):
     Q3=m2*p['cp']*(p['T3']-p['T2'])/3600; m4=m2*x2/p['x4'] if p['x4']>0 else 0; mv=m2-m4; Q4=mv*p['lambda_v']/3600; Q5=m4*p['cp']*55/3600; err=(p['m0']+p['mR'])-(p['residus']+mv+m4)
     qq=clean_text(q); lang=st.session_state.lang
     def has(*m): return any(x in qq for x in m)
-    if has("bonjour","salut","salam","hello","hi"): return "Salut ! 👋 Demande-moi : 'C'est quoi m1 ?' ou 'Pourquoi mon bilan est faux ?'" if lang=='FR' else "Hi! Ask me anything."
-    if has("filtr","m1","m0","residu"): return f"Filtration : m1 = {p['m0']:.0f} - {p['residus']:.0f} = **{m1:.2f} kg/h**"
-    if has("chauff","q3","cp","t2","t3"): return f"Chauffage : Q3 = **{Q3:.2f} kW** (de {p['T2']:.0f}°C à {p['T3']:.0f}°C)"
-    if has("evap","vapeur","q4","mv","m4"): return f"Évaporation : m4={m4:.2f}, mv={mv:.2f} kg/h, Q4={Q4:.2f} kW | {x2*100:.1f}% vs {p['x4']*100:.0f}%"
-    if has("bilan","erreur"): return f"Erreur bilan = **{err:.2f} kg/h**. " + ("✅ Parfait." if abs(err)<=1 else "⚠️ Vérifie m0, mR, résidus.")
-    if has("conclusion","que faire","conseil"): return "Regarde l'onglet 📝 Conclusion, tout est détaillé."
-    if has("graphique","graph"): return "Graphiques dans 📊 Résultats."
-    if has("pdf","export","telecharger","download"): return "Pour télécharger le rapport PDF professionnel, va dans l'onglet 📝 Conclusion et clique sur **📄 Télécharger le rapport PDF**."
-    return "Essaie : 'C'est quoi Q4 ?', 'Pourquoi mon bilan est faux ?', 'Où changer T3 ?'" if lang=='FR' else "Try: 'What is Q4?'"
+    
+    # Réponses d'accueil adaptées à la simulation de procédés
+    if has("bonjour","salut","salam","hello","hi"):
+        return "👋 Bonjour ! Posez vos questions en relation avec la simulation (ex: 'C'est quoi m1 ?', 'Comment optimiser le chauffage Q3 ?' ou 'Pourquoi mon bilan est faux ?')" if lang=='FR' else "👋 Hello! Ask your questions related to the simulation (e.g., 'What is m1?', 'How to optimize heating Q3?')."
+    
+    if has("filtr","m1","m0","residu"): return f"🧪 **Filtration** : m1 = {p['m0']:.0f} - {p['residus']:.0f} = **{m1:.2f} kg/h**"
+    if has("chauff","q3","cp","t2","t3"): return f"🔥 **Chauffage** : Q3 = **{Q3:.2f} kW** (chauffage de {p['T2']:.0f}°C à {p['T3']:.0f}°C)"
+    if has("evap","vapeur","q4","mv","m4"): return f"💨 **Évaporation** : m4={m4:.2f} kg/h, eau évaporée mv={mv:.2f} kg/h, Q4={Q4:.2f} kW | Concentration actuelle : {x2*100:.1f}% vs cible {p['x4']*100:.0f}%"
+    if has("bilan","erreur"): return f"⚖️ Erreur de bilan = **{err:.2f} kg/h**. " + ("✅ Le système est bien équilibré." if abs(err)<=1 else "⚠️ Vérifiez vos débits d'entrée et de sortie (m0, mR, résidus).")
+    if has("conclusion","que faire","conseil"): return "📝 Consultez l'onglet **Conclusion**, tout y est détaillé avec des recommandations sur l'efficacité énergétique."
+    if has("graphique","graph"): return "📊 Vous pouvez visualiser l'évolution des débits et des puissances dans l'onglet **Résultats**."
+    if has("pdf","export","telecharger","download"): return "📄 Pour télécharger votre rapport PDF d'ingénierie complet, rendez-vous dans l'onglet **Conclusion**."
+    
+    return "💡 Posez-moi une question sur le procédé : 'C'est quoi Q4 ?', 'Comment réduire la consommation thermique ?' ou 'Explique-moi le bilan matière'." if lang=='FR' else "💡 Ask me about the process: 'What is Q4?' or 'Explain material balance'."
 
 def generate_conclusion(m1,m2,m4,mv,Q3,Q4,Q5,x2,x4,erreur):
     out=[]
     out.append(f"⚠️ Bilan déséquilibré : Erreur {erreur:.2f} kg/h." if abs(erreur)>1 else "✅ Bilan équilibré : Entrées = Sorties.")
     taux=(x2/x4*100) if x4>0 else 0
-    if taux<95: out.append(f"🔴 Concentration insuffisante : {x2*100:.1f}% au lieu de {x4*100:.0f}%. Augmente l'évaporation.")
-    elif taux<100: out.append(f"🟡 Presque : {taux:.0f}% de l'objectif. Augmente Q4.")
-    else: out.append(f"✅ Objectif atteint : {x2*100:.1f}% >= {x4*100:.0f}%.")
-    if Q4>200: out.append(f"💡 Énergie élevée : Q4={Q4:.1f} kW. Récupère chaleur de Q5 ({Q5:.1f} kW).")
-    if abs(erreur)<=1 and taux>=100: out.append("🎯 Action : Procédé stable. Lance la production.")
-    elif abs(erreur)<=1: out.append("🎯 Action : Corrige d'abord la concentration.")
+    if taux<95: out.append(f"🔴 Concentration insuffisante : {x2*100:.1f}% au lieu de {x4*100:.0f}%. Augmentez l'évaporation.")
+    elif taux<100: out.append(f"🟡 Presque atteint : {taux:.0f}% de l'objectif. Ajustez Q4.")
+    else: out.append(f"✅ Objectif de concentration atteint : {x2*100:.1f}% >= {x4*100:.0f}%.")
+    if Q4>200: out.append(f"💡 Énergie élevée : Q4={Q4:.1f} kW. Envisagez de récupérer la chaleur de Q5 ({Q5:.1f} kW).")
+    if abs(erreur)<=1 and taux>=100: out.append("🎯 Action : Procédé stable et conforme. Prêt pour la production.")
+    elif abs(erreur)<=1: out.append("🎯 Action : Ajustez les paramètres de concentration.")
     return out
 
 # --- 1. PAGE D'ACCUEIL ---
@@ -323,8 +328,8 @@ def landing_page():
     with s3: st.markdown(f"<div class='feature'><h3>{t('step3')}</h3><p>{t('feat4_d')}</p></div>", unsafe_allow_html=True)
     
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
-    # Image par lien direct en relation avec la chimie de laboratoire[cite: 3]
-    st.image("https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&q=80&w=1200", caption="Analyse chimique & Laboratoire de procédés industriels", use_container_width=True)
+    # Image par lien direct représentant la simulation de procédés industriels
+    st.image("https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200", caption="Simulation de procédés industriels & Contrôle Qualité", use_container_width=True)
     st.markdown("<div style='text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 1rem;'>Simulateur Pro V2 • Conçu pour les étudiants en génie des procédés</div>", unsafe_allow_html=True)
 
 # --- 2. AUTH ---
@@ -430,7 +435,8 @@ def simulator_page():
         
     with tab_chat:
         st.subheader(t("chat_title"))
-        if "messages" not in st.session_state: st.session_state.messages=[{"role":"assistant","content":"Bonjour ! Une question ?" if st.session_state.lang=='FR' else "Hello! Any questions?"}]
+        if "messages" not in st.session_state: 
+            st.session_state.messages=[{"role":"assistant","content":"👋 Bonjour ! Posez vos questions en relation avec la simulation (ex: 'C'est quoi m1 ?' ou 'Pourquoi mon bilan est faux ?')" if st.session_state.lang=='FR' else "👋 Hello! Ask your questions related to the simulation."}]
         for m in st.session_state.messages:
             with st.chat_message(m["role"]): st.markdown(m["content"])
         if prompt:=st.chat_input(t("chat_placeholder")):
@@ -439,7 +445,7 @@ def simulator_page():
             resp=generate_bot_response(prompt); st.session_state.messages.append({"role":"assistant","content":resp})
             with st.chat_message("assistant"): st.markdown(resp)
             
-    # Pied de page (Footer) mis à jour
+    # Pied de page mis à jour
     st.markdown('<div style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2); padding-top: 1.5rem;">Simulateur Pro V2 • Conçu pour les étudiants en génie des procédés</div>', unsafe_allow_html=True)
 
 # --- ROUTAGE ---
