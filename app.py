@@ -6,7 +6,7 @@ import re
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(page_title="Simulateur Pro", layout="wide", page_icon="🧪")
 
-# --- 2. STYLE CSS PERSONNALISÉ (Couleurs corrigées) ---
+# --- 2. STYLE CSS PERSONNALISÉ ---
 st.markdown("""
 <style>
     /* Fond de l'application */
@@ -100,7 +100,6 @@ def authenticate_user(email, password):
 
 # --- 4. INTERFACE DE CONNEXION / INSCRIPTION ---
 def auth_page():
-    # Utilisation de colonnes pour centrer et ajouter une image
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
@@ -148,11 +147,10 @@ def auth_page():
                         st.warning("Cet email est déjà utilisé.")
                     else:
                         if create_user(new_username, new_email, new_password):
-                            # Connexion automatique après inscription
                             st.session_state['logged_in'] = True
                             st.session_state['username'] = new_username
                             st.success("Compte créé avec succès ! Redirection...")
-                            st.rerun() # Force le rechargement pour passer au simulateur
+                            st.rerun()
                         else:
                             st.error("Erreur lors de la création.")
 
@@ -176,31 +174,28 @@ def generate_bot_response(user_input):
 
 # --- 6. SIMULATEUR + GRAPHIQUES + CHATBOT ---
 def simulator_page():
-    import streamlit as st
-
-   # --- SÉLECTEUR DE THÈME  ---
-  with st.sidebar:
-    st.subheader("🎨 Apparence")
-    theme_choice = st.radio(
-        "Choisir le thème :",
-        ("Clair", "Sombre"),
-        index=0 if st.session_state.get('theme_mode', 'light') == 'light' else 1
-    )
-    if theme_choice == "Clair" and st.session_state.get('theme_mode') != 'light':
-        st._config.set_option('theme.base', 'light')
-        st.session_state['theme_mode'] = 'light'
-        st.rerun()
-    elif theme_choice == "Sombre" and st.session_state.get('theme_mode') != 'dark':
-        st._config.set_option('theme.base', 'dark')
-        st.session_state['theme_mode'] = 'dark'
-        st.rerun()
-    # ... à l'intérieur de simulator_page() ...
-    st.title("🧪 Simulateur de Bilan de Procédé")
-
-    # En-tête avec le nom de l'utilisateur
     st.title("🧪 Simulateur de Bilan de Procédé")
     st.markdown(f"Bienvenue **{st.session_state.get('username', 'Utilisateur')}** ! Ajustez les paramètres pour voir les résultats évoluer.")
     
+    # --- SÉLECTEUR DE THÈME DANS LA BARRE LATÉRALE ---
+    with st.sidebar:
+        st.subheader("🎨 Apparence")
+        theme_choice = st.radio(
+            "Choisir le thème :",
+            ("Clair", "Sombre"),
+            index=0 if st.session_state.get('theme_mode', 'light') == 'light' else 1
+        )
+        if theme_choice == "Clair" and st.session_state.get('theme_mode') != 'light':
+            st._config.set_option('theme.base', 'light')
+            st.session_state['theme_mode'] = 'light'
+            st.rerun()
+        elif theme_choice == "Sombre" and st.session_state.get('theme_mode') != 'dark':
+            st._config.set_option('theme.base', 'dark')
+            st.session_state['theme_mode'] = 'dark'
+            st.rerun()
+            
+        st.write("---")
+
     tab_params, tab_results, tab_chat = st.tabs(["⚙️ Paramètres d'entrée", "📊 Résultats & Graphiques", "🤖 Assistant Virtuel"])
     
     with tab_params:
@@ -224,7 +219,6 @@ def simulator_page():
     with tab_results:
         st.subheader("Résultats en temps réel")
         
-        # --- CALCULS ---
         m1 = m0 - residus
         x1 = (m0 * x0_sol) / m1 if m1 > 0 else 0
         m2 = m1 + mR
@@ -239,7 +233,6 @@ def simulator_page():
         sorties = residus + mv + m4
         erreur = entrees - sorties
 
-        # --- CARTES DE RÉSULTATS ---
         r1, r2, r3 = st.columns(3)
         r1.metric("Débit après filtration", f"{m1:,.2f} kg/h")
         r2.metric("Concentration mélange", f"{x2 * 100:.2f} %")
@@ -259,13 +252,11 @@ def simulator_page():
 
         st.write("---")
         
-        # --- GRAPHIQUES DYNAMIQUES ---
         st.subheader("📈 Visualisation Graphique")
         graph_col1, graph_col2 = st.columns(2)
         
         with graph_col1:
             st.write("**Évolution des débits (kg/h)**")
-            # Graphique en barres des débits
             chart_data_debits = {
                 "Étape": ["Initial (m0)", "Filtré (m1)", "Mélangé (m2)", "Final (m4)"],
                 "Débit": [m0, m1, m2, m4]
@@ -274,14 +265,12 @@ def simulator_page():
             
         with graph_col2:
             st.write("**Besoins énergétiques (kW)**")
-            # Graphique en barres des puissances
             chart_data_puissance = {
                 "Opération": ["Chauffage (Q3)", "Évaporation (Q4)", "Refroidissement (Q5)"],
                 "Puissance": [Q3, Q4, Q5]
             }
             st.bar_chart(chart_data_puissance, x="Opération", y="Puissance", color="#e74c3c")
 
-        # Barre de progression pour la concentration
         st.write("**Atteinte de l'objectif de concentration**")
         st.progress(min(x2 / x4 if x4 > 0 else 1.0, 1.0))
         st.caption(f"Objectif visé : {x4*100}% | Actuel : {x2*100:.2f}%")
