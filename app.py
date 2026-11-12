@@ -65,7 +65,7 @@ TRANSLATIONS = {
         "err_req": "All fields are required.", "err_email": "Invalid email.", "err_pass": "Passwords do not match.",
         "err_len": "Min. 8 characters.", "err_exist": "Email already used.", "succ_create": "Account created!", "err_create": "Creation error.",
         "landing_title": "Simulate your industrial process in 1 minute",
-        "landing_sub": "Calculate filtration, filtration, heating and evaporation. Get graphs, balance and automatic conclusion.",
+        "landing_sub": "Calculate filtration, heating and evaporation. Get graphs, balance and automatic conclusion.",
         "cta_start": "🚀 Start for free", "cta_login": "Already have an account? Login",
         "feat1": "⚡ Instant calculation", "feat1_d": "Real-time results as you change a value.",
         "feat2": "📊 Clear graphs", "feat2_d": "Visualize flows and energy powers.",
@@ -104,7 +104,7 @@ def authenticate_user(e,p):
     conn=sqlite3.connect('users.db'); c=conn.cursor(); c.execute("SELECT username,password_hash FROM users WHERE email=?", (e,)); r=c.fetchone(); conn.close()
     return r[0] if r and verify_password(p,r[1]) else None
 
-# --- DESIGN & NETTOYAGE DES CASES VIDES ---
+# --- DESIGN & CORRECTION DU BUG D'AFFICHAGE DU TITRE ---
 is_dark = st.session_state.theme_mode=='dark'
 if is_dark:
     BG="#0b1023"; CARD="rgba(255,255,255,0.06)"; CARD_SOLID="#1a213f"; TEXT="#f8fafc"; MUTED="#a5b4fc"
@@ -139,6 +139,19 @@ st.markdown(f"""
     #MainMenu {{visibility:hidden;}} header {{background:transparent !important;}}
     .block-container {{ padding-top: 2rem; padding-bottom: 3rem; max-width: 1200px; }}
 
+    /* CORRECTION DÉFINITIVE DU BUG D'AFFICHAGE DU TITRE DÉGRADÉ */
+    .gradient-title {{
+        font-family: Arial, sans-serif;
+        font-size: 28px;
+        font-weight: 900;
+        background: linear-gradient(135deg, {ACCENT}, {ACCENT2});
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        display: inline-block;
+    }}
+
     @media (max-width: 768px) {{
         .hero {{ padding:20px 16px !important; border-radius:18px !important; }}
         .hero h1 {{ font-size:24px !important; line-height:1.2 !important; }}
@@ -152,7 +165,7 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# --- NOUVEAU LOGO VECTORIEL PRO ---
+# --- LOGO VECTORIEL PRO ---
 def get_logo(w=260, h=70):
     return f"""<div style="display:flex; align-items:center; justify-content:center; gap:12px;">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
@@ -162,16 +175,14 @@ def get_logo(w=260, h=70):
                 <stop offset="100%" style="stop-color:{ACCENT2}"/>
             </linearGradient>
         </defs>
-        <!-- Erlenmeyer / Flask shape -->
         <path d="M35 15 L65 15 L65 25 L75 55 C80 70 70 85 55 85 L45 85 C30 85 20 70 25 55 L35 25 Z" fill="none" stroke="url(#logograd)" stroke-width="6" stroke-linejoin="round"/>
         <path d="M33 55 L67 55 L60 75 C55 80 45 80 40 75 Z" fill="url(#logograd)" opacity="0.4"/>
-        <!-- Atom orbits inside -->
         <ellipse cx="50" cy="45" rx="18" ry="7" fill="none" stroke="{ACCENT3}" stroke-width="2.5" transform="rotate(30 50 45)"/>
         <ellipse cx="50" cy="45" rx="18" ry="7" fill="none" stroke="{ACCENT3}" stroke-width="2.5" transform="rotate(-30 50 45)"/>
         <circle cx="50" cy="45" r="4" fill="{ACCENT3}"/>
     </svg>
     <div style="display:flex; flex-direction:column; line-height:1.1;">
-        <span style="font-family:Arial, sans-serif; font-size:28px; font-weight:900; background:linear-gradient(135deg, {ACCENT}, {ACCENT2}); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Simulateur</span>
+        <span class="gradient-title">Simulateur</span>
         <span style="font-family:Arial, sans-serif; font-size:16px; font-weight:800; color:{MUTED}; letter-spacing:5px;">PRO V2</span>
     </div></div>"""
 
@@ -185,7 +196,6 @@ def create_pdf_report(params, results, conclusions, username):
         
         buf = BytesIO(); c = canvas.Canvas(buf, pagesize=A4); w, h = A4
         
-        # En-tête stylisé
         c.setFillColor(colors.HexColor("#7c3aed"))
         c.rect(0, h - 70, w, 70, fill=1, stroke=0)
         c.setFillColor(colors.white)
@@ -197,7 +207,6 @@ def create_pdf_report(params, results, conclusions, username):
         y = h - 90
         c.setFillColor(colors.HexColor("#1e1b4b"))
         
-        # Section 1 : Paramètres
         c.setFont("Helvetica-Bold", 13)
         c.drawString(20 * mm, y, "1. Paramètres d'entrée du Procédé")
         y -= 18
@@ -208,7 +217,6 @@ def create_pdf_report(params, results, conclusions, username):
             if y < 50: c.showPage(); y = h - 40
             
         y -= 6
-        # Section 2 : Résultats
         c.setFont("Helvetica-Bold", 13)
         c.drawString(20 * mm, y, "2. Résultats des Bilans Matière et Énergétique")
         y -= 18
@@ -219,7 +227,6 @@ def create_pdf_report(params, results, conclusions, username):
             if y < 50: c.showPage(); y = h - 40
             
         y -= 6
-        # Section 3 : Conclusions
         c.setFont("Helvetica-Bold", 13)
         c.drawString(20 * mm, y, "3. Conclusions & Recommandations Techniques")
         y -= 18
@@ -235,7 +242,6 @@ def create_pdf_report(params, results, conclusions, username):
             y -= 16
             if y < 50: c.showPage(); y = h - 40
             
-        # Pied de page
         c.setFont("Helvetica-Oblique", 8)
         c.setFillColor(colors.HexColor("#6366f1"))
         c.drawString(20 * mm, 15, "Généré automatiquement par Simulateur Pro V2 • Usage académique et industriel.")
@@ -317,9 +323,9 @@ def landing_page():
     with s3: st.markdown(f"<div class='feature'><h3>{t('step3')}</h3><p>{t('feat4_d')}</p></div>", unsafe_allow_html=True)
     
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
-    # Image esthétique en relation avec la chimie de laboratoire
+    # Image par lien direct en relation avec la chimie de laboratoire[cite: 3]
     st.image("https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&q=80&w=1200", caption="Analyse chimique & Laboratoire de procédés industriels", use_container_width=True)
-    st.caption("Simulateur Pro V2 • Conçu pour les étudiants et ingénieurs en génie des procédés et contrôle qualité")
+    st.markdown("<div style='text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 1rem;'>Simulateur Pro V2 • Conçu pour les étudiants en génie des procédés</div>", unsafe_allow_html=True)
 
 # --- 2. AUTH ---
 def auth_page():
@@ -420,7 +426,7 @@ def simulator_page():
         
         pdf_bytes = create_pdf_report(params_dict, results_dict, concls, st.session_state.get('username','Utilisateur'))
         st.download_button(t("export_pdf"), data=pdf_bytes, file_name=f"rapport_simulateur_{st.session_state.get('username','user')}.pdf", mime="application/pdf", use_container_width=True)
-        st.caption("📄 Le PDF exporté dispose maintenant d'une mise en page professionnelle (en-tête stylisé, séparation claire des sections, idéal pour vos rapports de PFE).")
+        st.caption("📄 Le PDF exporté dispose d'une mise en page professionnelle (en-tête stylisé, séparation claire des sections, idéal pour vos rapports de PFE).")
         
     with tab_chat:
         st.subheader(t("chat_title"))
@@ -432,6 +438,9 @@ def simulator_page():
             with st.chat_message("user"): st.markdown(prompt)
             resp=generate_bot_response(prompt); st.session_state.messages.append({"role":"assistant","content":resp})
             with st.chat_message("assistant"): st.markdown(resp)
+            
+    # Pied de page (Footer) mis à jour
+    st.markdown('<div style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2); padding-top: 1.5rem;">Simulateur Pro V2 • Conçu pour les étudiants en génie des procédés</div>', unsafe_allow_html=True)
 
 # --- ROUTAGE ---
 if st.session_state.logged_in and st.session_state.page=='app':
