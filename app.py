@@ -1,82 +1,181 @@
 # ==============================================================================
-# IMPORTATION DES BIBLIOTHÈQUES EXTERNES ET INTERNES
+# IMPORTATION DES BIBLIOTHÈQUES
 # ==============================================================================
-import streamlit as st      # Framework pour créer l'interface web interactive
-import sqlite3              # Base de données légère intégrée à Python pour stocker les utilisateurs
-import bcrypt               # Bibliothèque de cryptographie pour hacher les mots de passe en toute sécurité
-import re                   # Module pour les expressions régulières (validation des emails)
-import pandas as pd         # Manipulation de données (utilisé ici pour stabiliser les graphiques)
+import streamlit as st
+import sqlite3
+import bcrypt
+import re
+import pandas as pd
 
-# Configuration de la page web (titre de l'onglet, disposition large, icône)
 st.set_page_config(page_title="Simulateur Pro", layout="wide", page_icon="🧪")
 
 # ==============================================================================
-# GESTION DE LA BASE DE DONNÉES (SQLITE)
+# 1. DICTIONNAIRE DE TRADUCTION (FR / EN)
 # ==============================================================================
+TRANSLATIONS = {
+    "FR": {
+        "app_title": "🧪 Simulateur Pro",
+        "app_subtitle": "Filtration • Chauffage • Évaporation",
+        "theme_btn": "🌙 Sombre" if st.session_state.get('theme_mode') != 'dark' else "☀️ Clair",
+        "lang_btn": "🇬🇧 English",
+        "login_tab": "🔑 Se connecter",
+        "signup_tab": "📝 Créer un compte",
+        "email": "📧 Email",
+        "password": "🔒 Mot de passe",
+        "confirm_pass": "🔒 Confirmer",
+        "username": "👤 Nom d'utilisateur",
+        "login_btn": "Se connecter →",
+        "signup_btn": "Créer mon compte ✨",
+        "sidebar_welcome": "Bonjour",
+        "logout": "🚪 Se déconnecter",
+        "info_msg": "💡 Modifiez les paramètres puis allez dans Résultats.",
+        "sim_title": "🧪 Simulateur de Bilan",
+        "sim_caption": "Ajustez les paramètres pour voir les résultats évoluer en temps réel.",
+        "tab_params": "⚙️ Paramètres",
+        "tab_results": "📊 Résultats & Graphiques",
+        "tab_conclusion": "📝 Conclusion",
+        "tab_chat": "🤖 Assistant",
+        "m0": "Débit initial m0 (kg/h)",
+        "x0": "Fraction solubles x0 (0-1)",
+        "residus": "Résidus filtrés (kg/h)",
+        "mR": "Apport jus concentré mR (kg/h)",
+        "xR": "Concentration apport xR (0-1)",
+        "T2": "Température entrée T2 (°C)",
+        "T3": "Température chauffage T3 (°C)",
+        "cp": "Cp [kJ/(kg·K)]",
+        "x4": "Concentration finale visée x4 (0-1)",
+        "lambda_v": "Chaleur latente [kJ/kg]",
+        "res_real_time": "Résultats en temps réel",
+        "metric_m1": "Débit après filtration",
+        "metric_x2": "Concentration mélange",
+        "metric_m4": "Débit final",
+        "metric_mv": "Eau évaporée",
+        "metric_Q3": "Puissance chauffage",
+        "metric_Q4": "Puissance évaporation",
+        "metric_Q5": "Puissance refroidissement",
+        "metric_err": "Erreur bilan",
+        "graphs": "📈 Graphiques",
+        "obj_reach": "**Atteinte de l'objectif**",
+        "obj_text": "Objectif",
+        "concl_title": "📝 Conclusion & Recommandations",
+        "summary": "En résumé",
+        "chat_title": "🤖 Assistant Virtuel",
+        "chat_placeholder": "Posez votre question...",
+        "err_fill": "Veuillez remplir tous les champs.",
+        "err_auth": "Email ou mot de passe incorrect.",
+        "err_req": "Tous les champs sont obligatoires.",
+        "err_email": "Email invalide.",
+        "err_pass": "Mots de passe différents.",
+        "err_len": "Min. 8 caractères.",
+        "err_exist": "Email déjà utilisé.",
+        "succ_create": "Compte créé !",
+        "err_create": "Erreur création."
+    },
+    "EN": {
+        "app_title": "🧪 Pro Simulator",
+        "app_subtitle": "Filtration • Heating • Evaporation",
+        "theme_btn": "🌙 Dark" if st.session_state.get('theme_mode') != 'dark' else "☀️ Light",
+        "lang_btn": "🇫🇷 Français",
+        "login_tab": "🔑 Login",
+        "signup_tab": "📝 Sign Up",
+        "email": "📧 Email",
+        "password": "🔒 Password",
+        "confirm_pass": "🔒 Confirm",
+        "username": "👤 Username",
+        "login_btn": "Login →",
+        "signup_btn": "Create Account ✨",
+        "sidebar_welcome": "Hello",
+        "logout": "🚪 Logout",
+        "info_msg": "💡 Modify parameters then check Results.",
+        "sim_title": "🧪 Mass & Energy Balance Simulator",
+        "sim_caption": "Adjust parameters to see results update in real-time.",
+        "tab_params": "⚙️ Parameters",
+        "tab_results": "📊 Results & Graphs",
+        "tab_conclusion": "📝 Conclusion",
+        "tab_chat": "🤖 Assistant",
+        "m0": "Initial flow m0 (kg/h)",
+        "x0": "Soluble fraction x0 (0-1)",
+        "residus": "Filtered residues (kg/h)",
+        "mR": "Concentrated juice input mR (kg/h)",
+        "xR": "Input concentration xR (0-1)",
+        "T2": "Inlet temperature T2 (°C)",
+        "T3": "Heating temperature T3 (°C)",
+        "cp": "Cp [kJ/(kg·K)]",
+        "x4": "Target final concentration x4 (0-1)",
+        "lambda_v": "Latent heat [kJ/kg]",
+        "res_real_time": "Real-time Results",
+        "metric_m1": "Flow after filtration",
+        "metric_x2": "Mixture concentration",
+        "metric_m4": "Final flow",
+        "metric_mv": "Evaporated water",
+        "metric_Q3": "Heating power",
+        "metric_Q4": "Evaporation power",
+        "metric_Q5": "Cooling power",
+        "metric_err": "Balance error",
+        "graphs": "📈 Graphs",
+        "obj_reach": "**Objective Achievement**",
+        "obj_text": "Target",
+        "concl_title": "📝 Conclusion & Recommendations",
+        "summary": "In summary",
+        "chat_title": "🤖 Virtual Assistant",
+        "chat_placeholder": "Ask your question...",
+        "err_fill": "Please fill all fields.",
+        "err_auth": "Incorrect email or password.",
+        "err_req": "All fields are required.",
+        "err_email": "Invalid email.",
+        "err_pass": "Passwords do not match.",
+        "err_len": "Min. 8 characters.",
+        "err_exist": "Email already used.",
+        "succ_create": "Account created!",
+        "err_create": "Creation error."
+    }
+}
+
+# Fonction de traduction globale
+def t(key):
+    return TRANSLATIONS[st.session_state.lang].get(key, key)
+
+# ==============================================================================
+# 2. INITIALISATION DE LA SESSION ET BASE DE DONNÉES
+# ==============================================================================
+if 'theme_mode' not in st.session_state: st.session_state.theme_mode = 'light'
+if 'lang' not in st.session_state: st.session_state.lang = 'FR'
+
 def init_db():
-    """Initialise la base de données SQLite et crée la table 'users' si elle n'existe pas."""
-    conn = sqlite3.connect('users.db') # Connexion au fichier de base de données
-    c = conn.cursor()
-    # Création de la table avec un ID unique, un nom, un email unique et un mot de passe haché
-    c.execute('''CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL)''')
-    conn.commit() # Sauvegarde des modifications
-    conn.close()  # Fermeture de la connexion
-init_db() # Appel de la fonction au démarrage de l'application
-
-def hash_password(p): 
-    """Hache le mot de passe en clair avec l'algorithme Bcrypt et un sel aléatoire."""
-    return bcrypt.hashpw(p.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-def verify_password(p, h): 
-    """Vérifie si le mot de passe saisi correspond au hachage stocké dans la base."""
-    return bcrypt.checkpw(p.encode('utf-8'), h.encode('utf-8'))
-
-def email_exists(email):
-    """Vérifie si un email existe déjà dans la base de données pour éviter les doublons."""
     conn = sqlite3.connect('users.db'); c = conn.cursor()
-    c.execute("SELECT 1 FROM users WHERE email = ?", (email,))
-    r = c.fetchone()
-    conn.close()
-    return r is not None # Retourne True si l'email est trouvé, False sinon
+    c.execute('''CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL)''')
+    conn.commit(); conn.close()
+init_db()
 
+def hash_password(p): return bcrypt.hashpw(p.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+def verify_password(p, h): return bcrypt.checkpw(p.encode('utf-8'), h.encode('utf-8'))
+def email_exists(email):
+    conn = sqlite3.connect('users.db'); c = conn.cursor()
+    c.execute("SELECT 1 FROM users WHERE email = ?", (email,)); r = c.fetchone(); conn.close()
+    return r is not None
 def create_user(username, email, password):
-    """Insère un nouvel utilisateur dans la base de données avec son mot de passe haché."""
     conn = sqlite3.connect('users.db'); c = conn.cursor()
     try:
         c.execute("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)", (username, email, hash_password(password)))
-        conn.commit()
-        return True # Succès
-    except sqlite3.IntegrityError: 
-        return False # Échec (probablement un email en double)
-    finally: 
-        conn.close()
-
+        conn.commit(); return True
+    except sqlite3.IntegrityError: return False
+    finally: conn.close()
 def authenticate_user(email, password):
-    """Vérifie les identifiants de connexion et retourne le nom d'utilisateur si valide."""
     conn = sqlite3.connect('users.db'); c = conn.cursor()
     c.execute("SELECT username, password_hash FROM users WHERE email = ?", (email,))
-    r = c.fetchone()
-    conn.close()
-    if r and verify_password(password, r[1]): 
-        return r[0] # Retourne le nom d'utilisateur
-    return None # Retourne None si l'authentification échoue
+    r = c.fetchone(); conn.close()
+    if r and verify_password(password, r[1]): return r[0]
+    return None
 
 # ==============================================================================
-# GESTION DU THÈME (MODE CLAIR / MODE SOMBRE)
+# 3. GESTION DU THÈME (CSS)
 # ==============================================================================
-# Initialisation du thème par défaut (mode clair) dans la mémoire de la session
-if 'theme_mode' not in st.session_state: 
-    st.session_state.theme_mode = 'light'
-
-is_dark = st.session_state.theme_mode == 'dark' # Booléen pour savoir si on est en mode sombre
-
-# Définition des palettes de couleurs selon le mode choisi
+is_dark = st.session_state.theme_mode == 'dark'
 if is_dark:
     BG="#0f172a"; CARD="#1e293b"; TEXT="#f1f5f9"; MUTED="#94a3b8"; INPUT_BG="#1e293b"; INPUT_BORDER="#334155"; ACCENT="#38bdf8"; ACCENT2="#818cf8"
 else:
     BG="#eef2f7"; CARD="#ffffff"; TEXT="#1e293b"; MUTED="#64748b"; INPUT_BG="#ffffff"; INPUT_BORDER="#e2e8f0"; ACCENT="#2563eb"; ACCENT2="#7c3aed"
 
-# Injection de code CSS personnalisé pour embellir l'interface Streamlit
 st.markdown(f"""
 <style>
     .stApp {{ background: {BG}; color: {TEXT}; }}
@@ -103,284 +202,301 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# LOGIQUE DE L'ASSISTANT VIRTUEL (CHATBOT)
+# 4. LOGIQUE DU CHATBOT INTELLIGENT (SCORING PAR MOTS-CLÉS)
 # ==============================================================================
-def generate_bot_response(u):
-    """Analyse la question de l'utilisateur et retourne une réponse basée sur des mots-clés."""
-    u = u.lower()
-    if "bonjour" in u or "salut" in u: return "Bonjour ! Posez-moi des questions sur la filtration, le chauffage ou l'évaporation."
-    elif "filtration" in u: return "La filtration retire les particules. m1 = m0 - résidus."
-    elif "chauffage" in u: return "Le chauffage augmente la température. Q3 = m2 * Cp * (T3-T2) / 3600."
-    elif "évaporation" in u or "vapeur" in u: return "L'évaporation retire de l'eau. Q4 = mv * lambda_v / 3600."
-    else: return "Essayez 'Comment ça marche ?' ou demandez-moi la 'filtration'."
+def generate_bot_response(user_input):
+    """Analyse la question et retourne la meilleure réponse basée sur un score de mots-clés."""
+    u = user_input.lower()
+    lang = st.session_state.lang
+    
+    # Dictionnaire d'intentions avec liste de mots-clés (FR/EN) et réponses
+    intents = {
+        "filtration": {
+            "keywords": ["filtr", "tamis", "résidu", "residu", "solide", "particule", "m1", "m0", "filter", "residue", "solid"],
+            "response": {
+                "FR": "La filtration retire les particules solides. Formule : **m1 = m0 - résidus** (kg/h). Entrez la quantité de résidus dans les paramètres.",
+                "EN": "Filtration removes solid particles. Formula: **m1 = m0 - residues** (kg/h). Enter the residue amount in the parameters."
+            }
+        },
+        "chauffage": {
+            "keywords": ["chauff", "temp", "cp", "t2", "t3", "q3", "heat", "cook", "chaleur", "puissance"],
+            "response": {
+                "FR": "Le chauffage élève la température du mélange. Formule : **Q3 = m2 × Cp × (T3 - T2) / 3600** (en kW).",
+                "EN": "Heating raises the mixture temperature. Formula: **Q3 = m2 × Cp × (T3 - T2) / 3600** (in kW)."
+            }
+        },
+        "evaporation": {
+            "keywords": ["évap", "evap", "vapeur", "vapor", "q4", "latent", "lambda", "mv", "eau", "water", "bouillir", "boil"],
+            "response": {
+                "FR": "L'évaporation retire l'eau sous forme de vapeur. Formule : **Q4 = mv × λ / 3600**. Le débit d'eau évaporée est **mv = m2 - m4**.",
+                "EN": "Evaporation removes water as vapor. Formula: **Q4 = mv × λ / 3600**. Evaporated water flow is **mv = m2 - m4**."
+            }
+        },
+        "bilan": {
+            "keywords": ["bilan", "erreur", "error", "masse", "mass", "balance", "entrée", "sortie", "input", "output"],
+            "response": {
+                "FR": "Le bilan matière vérifie que Entrées = Sorties. Si l'erreur est proche de 0, le système est équilibré. Formule : **(m0 + mR) - (résidus + mv + m4)**.",
+                "EN": "Mass balance verifies Inputs = Outputs. If the error is close to 0, the system is balanced. Formula: **(m0 + mR) - (residues + mv + m4)**."
+            }
+        },
+        "interface": {
+            "keywords": ["lang", "langue", "theme", "sombre", "clair", "dark", "light", "onglet", "tab", "changer", "modifier", "interface", "navig"],
+            "response": {
+                "FR": "Pour changer la langue ou le thème, utilisez les boutons dans la barre latérale à gauche. Naviguez entre les onglets 'Paramètres', 'Résultats' et 'Conclusion' en haut de l'écran.",
+                "EN": "To change language or theme, use the buttons in the left sidebar. Navigate between 'Parameters', 'Results', and 'Conclusion' tabs at the top of the screen."
+            }
+        },
+        "salutation": {
+            "keywords": ["bonjour", "salut", "hello", "hi", "hey", "coucou"],
+            "response": {
+                "FR": "Bonjour ! Je suis votre assistant. Posez-moi des questions sur les calculs (filtration, chauffage, évaporation), le bilan ou l'interface.",
+                "EN": "Hello! I am your assistant. Ask me questions about calculations (filtration, heating, evaporation), balance, or the interface."
+            }
+        }
+    }
+    
+    # Calcul du score pour chaque intention
+    best_intent = None
+    max_score = 0
+    
+    for intent, data in intents.items():
+        score = sum(1 for kw in data["keywords"] if kw in u)
+        if score > max_score:
+            max_score = score
+            best_intent = intent
+            
+    # Retour de la réponse si un mot-clé a été trouvé
+    if best_intent:
+        return intents[best_intent]["response"][lang]
+        
+    # Réponse par défaut si aucune correspondance
+    return {
+        "FR": "Je n'ai pas bien compris. Essayez de me parler de 'filtration', 'chauffage', 'évaporation', 'bilan' ou de l' 'interface'.",
+        "EN": "I didn't quite understand. Try asking about 'filtration', 'heating', 'evaporation', 'balance', or the 'interface'."
+    }[lang]
 
 # ==============================================================================
-# LOGIQUE DES CONCLUSIONS ET RECOMMANDATIONS DU SIMULATEUR
+# 5. GÉNÉRATION DES CONCLUSIONS
 # ==============================================================================
 def generate_conclusion(m1,m2,m4,mv,Q3,Q4,Q5,x2,x4,erreur):
-    """Analyse les résultats du calcul et génère une liste de conseils et d'alertes."""
     conclusions = []
+    lang = st.session_state.lang
     
-    # 1. Vérification du bilan matière (Entrées = Sorties)
+    # 1. Bilan matière
     if abs(erreur) > 1:
-        conclusions.append(f"⚠️ **Bilan matière déséquilibré :** Erreur de {erreur:.2f} kg/h. Vérifiez vos saisies (m0, mR, résidus). Un bilan doit être proche de 0.")
+        conclusions.append({
+            "FR": f"⚠️ **Bilan matière déséquilibré :** Erreur de {erreur:.2f} kg/h. Vérifiez vos saisies (m0, mR, résidus).",
+            "EN": f"⚠️ **Unbalanced mass balance:** Error of {erreur:.2f} kg/h. Check your inputs (m0, mR, residues)."
+        }[lang])
     else:
-        conclusions.append("✅ **Bilan matière équilibré :** Entrées = Sorties. Vos calculs sont cohérents.")
+        conclusions.append({
+            "FR": "✅ **Bilan matière équilibré :** Entrées = Sorties. Vos calculs sont cohérents.",
+            "EN": "✅ **Balanced mass balance:** Inputs = Outputs. Your calculations are consistent."
+        }[lang])
 
-    # 2. Vérification de l'atteinte de l'objectif de concentration
+    # 2. Concentration
     taux = (x2 / x4 * 100) if x4>0 else 0
     if taux < 95:
-        conclusions.append(f"🔴 **Concentration insuffisante :** Vous êtes à {x2*100:.1f}% au lieu de {x4*100:.0f}% visé ({taux:.0f}% de l'objectif). **Que faire ?** Augmentez l'évaporation (plus de vapeur), ou augmentez T3, ou diminuez l'apport mR.")
+        conclusions.append({
+            "FR": f"🔴 **Concentration insuffisante :** Vous êtes à {x2*100:.1f}% au lieu de {x4*100:.0f}% visé. Augmentez l'évaporation (plus de vapeur) ou diminuez l'apport mR.",
+            "EN": f"🔴 **Insufficient concentration:** You are at {x2*100:.1f}% instead of the targeted {x4*100:.0f}%. Increase evaporation (more vapor) or decrease the mR input."
+        }[lang])
     elif taux < 100:
-        conclusions.append(f"🟡 **Presque atteint :** Vous êtes à {taux:.0f}% de l'objectif. Augmentez légèrement la puissance d'évaporation Q4.")
+        conclusions.append({
+            "FR": f"🟡 **Presque atteint :** Vous êtes à {taux:.0f}% de l'objectif. Augmentez légèrement la puissance d'évaporation Q4.",
+            "EN": f"🟡 **Almost reached:** You are at {taux:.0f}% of the objective. Slightly increase the evaporation power Q4."
+        }[lang])
     else:
-        conclusions.append(f"✅ **Objectif atteint :** Concentration de {x2*100:.1f}% >= {x4*100:.0f}% visé. Le produit est conforme.")
+        conclusions.append({
+            "FR": f"✅ **Objectif atteint :** Concentration de {x2*100:.1f}% >= {x4*100:.0f}% visé. Le produit est conforme.",
+            "EN": f"✅ **Objective reached:** Concentration of {x2*100:.1f}% >= {x4*100:.0f}% targeted. The product is compliant."
+        }[lang])
 
-    # 3. Analyse énergétique
-    total_Q = Q3+Q4+Q5
+    # 3. Énergie
     if Q4 > 200:
-        conclusions.append(f"💡 **Énergie élevée :** Q4 = {Q4:.1f} kW est important. **Conseil :** Vérifiez si vous pouvez récupérer la chaleur du refroidissement (Q5 = {Q5:.1f} kW) pour préchauffer l'entrée et économiser.")
+        conclusions.append({
+            "FR": f"💡 **Énergie élevée :** Q4 = {Q4:.1f} kW est important. Vérifiez si vous pouvez récupérer la chaleur du refroidissement (Q5 = {Q5:.1f} kW).",
+            "EN": f"💡 **High energy:** Q4 = {Q4:.1f} kW is significant. Check if you can recover the cooling heat (Q5 = {Q5:.1f} kW)."
+        }[lang])
     if mv <= 0:
-        conclusions.append("⚠️ **Aucune évaporation :** mv = 0. Le mélange est déjà plus concentré que l'objectif. Diminuez xR ou augmentez x4.")
+        conclusions.append({
+            "FR": "⚠️ **Aucune évaporation :** mv = 0. Le mélange est déjà plus concentré que l'objectif. Diminuez xR ou augmentez x4.",
+            "EN": "⚠️ **No evaporation:** mv = 0. The mixture is already more concentrated than the objective. Decrease xR or increase x4."
+        }[lang])
 
-    # 4. Recommandation finale d'action
+    # 4. Action
     if abs(erreur) <= 1 and taux >= 100:
-        conclusions.append("🎯 **Action recommandée :** Procédé stable. Vous pouvez lancer la production et surveiller T3 et Q4 en continu.")
+        conclusions.append({
+            "FR": "🎯 **Action recommandée :** Procédé stable. Vous pouvez lancer la production.",
+            "EN": "🎯 **Recommended action:** Process is stable. You can start production."
+        }[lang])
     elif abs(erreur) <= 1:
-        conclusions.append("🎯 **Action recommandée :** Corrigez d'abord la concentration avant de lancer la production.")
+        conclusions.append({
+            "FR": "🎯 **Action recommandée :** Corrigez d'abord la concentration avant de lancer la production.",
+            "EN": "🎯 **Recommended action:** Correct the concentration first before starting production."
+        }[lang])
     
     return conclusions
 
 # ==============================================================================
-# INTERFACE D'AUTHENTIFICATION (CONNEXION / INSCRIPTION)
+# 6. PAGE D'AUTHENTIFICATION
 # ==============================================================================
 def auth_page():
-    """Affiche la page de connexion et d'inscription pour les utilisateurs non connectés."""
-    # Création de 3 colonnes pour centrer le formulaire au milieu de l'écran
     c1,c2,c3 = st.columns([1,1.6,1])
     with c2:
-        # Affichage du logo et du sous-titre avec un dégradé de couleur
-        st.markdown(f"<h1 style='text-align:center; background: linear-gradient(135deg, {ACCENT}, {ACCENT2}); -webkit-background-clip:text; -webkit-text-fill-color:transparent;'>🧪 Simulateur Pro</h1><p style='text-align:center; color:{MUTED};'>Filtration • Chauffage • Évaporation</p>", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align:center; background: linear-gradient(135deg, {ACCENT}, {ACCENT2}); -webkit-background-clip:text; -webkit-text-fill-color:transparent;'>{t('app_title')}</h1><p style='text-align:center; color:{MUTED};'>{t('app_subtitle')}</p>", unsafe_allow_html=True)
         
-        # Bouton pour basculer entre le mode sombre et clair
-        if st.button("🌙 Sombre" if not is_dark else "☀️ Clair"):
-            st.session_state.theme_mode = 'dark' if not is_dark else 'light'
-            st.rerun() # Recharge la page pour appliquer le nouveau thème
-            
-        # Création de deux onglets : Connexion et Inscription
-        tab1, tab2 = st.tabs(["🔑 Se connecter", "📝 Créer un compte"])
-        
-        # Onglet 1 : Formulaire de connexion
+        # Boutons de configuration (Langue et Thème)
+        col_lang, col_theme = st.columns(2)
+        with col_lang:
+            if st.button(t("lang_btn")):
+                st.session_state.lang = 'EN' if st.session_state.lang == 'FR' else 'FR'
+                st.rerun()
+        with col_theme:
+            if st.button(t("theme_btn")):
+                st.session_state.theme_mode = 'dark' if not is_dark else 'light'
+                st.rerun()
+                
+        tab1, tab2 = st.tabs([t("login_tab"), t("signup_tab")])
         with tab1:
             with st.form("login_form"):
-                email = st.text_input("📧 Email", placeholder="exemple@email.com")
-                password = st.text_input("🔒 Mot de passe", type="password")
-                if st.form_submit_button("Se connecter →"):
-                    if not email or not password: 
-                        st.error("Veuillez remplir tous les champs.")
+                email = st.text_input(t("email"), placeholder="exemple@email.com")
+                password = st.text_input(t("password"), type="password")
+                if st.form_submit_button(t("login_btn")):
+                    if not email or not password: st.error(t("err_fill"))
                     else:
                         user = authenticate_user(email, password)
-                        if user: 
-                            st.session_state['logged_in']=True
-                            st.session_state['username']=user
-                            st.rerun() # Redirige vers le simulateur
-                        else: 
-                            st.error("Email ou mot de passe incorrect.")
-                            
-        # Onglet 2 : Formulaire d'inscription
+                        if user: st.session_state['logged_in']=True; st.session_state['username']=user; st.rerun()
+                        else: st.error(t("err_auth"))
         with tab2:
             with st.form("signup_form"):
-                nu = st.text_input("👤 Nom d'utilisateur")
-                ne = st.text_input("📧 Email")
-                npw = st.text_input("🔒 Mot de passe", type="password")
-                cpw = st.text_input("🔒 Confirmer", type="password")
-                if st.form_submit_button("Créer mon compte ✨"):
-                    # Vérifications de sécurité basiques
-                    if not nu or not ne or not npw: 
-                        st.error("Tous les champs sont obligatoires.")
-                    elif not re.match(r"[^@]+@[^@]+\.[^@]+", ne): 
-                        st.error("Email invalide.")
-                    elif npw != cpw: 
-                        st.error("Mots de passe différents.")
-                    elif len(npw) < 8: 
-                        st.error("Min. 8 caractères.")
-                    elif email_exists(ne): 
-                        st.warning("Email déjà utilisé.")
+                nu = st.text_input(t("username")); ne = st.text_input(t("email")); npw = st.text_input(t("password"), type="password"); cpw = st.text_input(t("confirm_pass"), type="password")
+                if st.form_submit_button(t("signup_btn")):
+                    if not nu or not ne or not npw: st.error(t("err_req"))
+                    elif not re.match(r"[^@]+@[^@]+\.[^@]+", ne): st.error(t("err_email"))
+                    elif npw != cpw: st.error(t("err_pass"))
+                    elif len(npw) < 8: st.error(t("err_len"))
+                    elif email_exists(ne): st.warning(t("err_exist"))
                     else:
-                        if create_user(nu, ne, npw): 
-                            st.session_state['logged_in']=True
-                            st.session_state['username']=nu
-                            st.success("Compte créé !")
-                            st.rerun()
-                        else: 
-                            st.error("Erreur création.")
+                        if create_user(nu, ne, npw): st.session_state['logged_in']=True; st.session_state['username']=nu; st.success(t("succ_create")); st.rerun()
+                        else: st.error(t("err_create"))
 
 # ==============================================================================
-# INTERFACE PRINCIPALE DU SIMULATEUR (UTILISATEUR CONNECTÉ)
+# 7. PAGE PRINCIPALE DU SIMULATEUR
 # ==============================================================================
 def simulator_page():
-    """Affiche le simulateur de bilan matière et énergétique."""
-    
-    # Barre latérale (Sidebar) avec les informations utilisateur
     with st.sidebar:
-        st.markdown(f"### 🧪 Simulateur Pro\nBonjour, **{st.session_state.get('username')}**")
-        if st.button("🌙 Sombre" if not is_dark else "☀️ Clair"):
-            st.session_state.theme_mode = 'dark' if not is_dark else 'light'
-            st.rerun()
-        st.info("💡 Modifiez les paramètres puis allez dans Résultats.")
-        if st.button("🚪 Se déconnecter"):
-            st.session_state['logged_in']=False
-            st.session_state['messages']=[]
-            st.rerun()
+        st.markdown(f"### {t('app_title')}\n{t('sidebar_welcome')}, **{st.session_state.get('username')}**")
+        
+        col_lang, col_theme = st.columns(2)
+        with col_lang:
+            if st.button(t("lang_btn")):
+                st.session_state.lang = 'EN' if st.session_state.lang == 'FR' else 'FR'
+                st.rerun()
+        with col_theme:
+            if st.button(t("theme_btn")):
+                st.session_state.theme_mode = 'dark' if not is_dark else 'light'
+                st.rerun()
+                
+        st.info(t("info_msg"))
+        if st.button(t("logout")):
+            st.session_state['logged_in']=False; st.session_state['messages']=[]; st.rerun()
 
-    # Titre et description
-    st.title("🧪 Simulateur de Bilan")
-    st.caption("Ajustez les paramètres pour voir les résultats évoluer en temps réel.")
+    st.title(t("sim_title"))
+    st.caption(t("sim_caption"))
     
-    # Création de 3 onglets principaux
-    tab_params, tab_results, tab_chat = st.tabs(["⚙️ Paramètres", "📊 Résultats & Graphiques", "🤖 Assistant"])
+    tab_params, tab_results, tab_conclusion, tab_chat = st.tabs([
+        t("tab_params"), t("tab_results"), t("tab_conclusion"), t("tab_chat")
+    ])
 
-    # --------------------------------------------------------------------------
-    # ONGLET 1 : SAISIE DES PARAMÈTRES
-    # --------------------------------------------------------------------------
+    # --- ONGLET PARAMÈTRES ---
     with tab_params:
         col1, col2 = st.columns(2)
         with col1:
-            m0 = st.number_input("Débit initial m0 (kg/h)", value=1000.0)
-            x0_sol = st.number_input("Fraction solubles x0 (0-1)", value=0.10)
-            residus = st.number_input("Résidus filtrés (kg/h)", value=20.0)
-            mR = st.number_input("Apport jus concentré mR (kg/h)", value=100.0)
-            xR = st.number_input("Concentration apport xR (0-1)", value=0.40)
+            m0 = st.number_input(t("m0"), value=1000.0)
+            x0_sol = st.number_input(t("x0"), value=0.10)
+            residus = st.number_input(t("residus"), value=20.0)
+            mR = st.number_input(t("mR"), value=100.0)
+            xR = st.number_input(t("xR"), value=0.40)
         with col2:
-            T2 = st.number_input("Température entrée T2 (°C)", value=20.0)
-            T3 = st.number_input("Température chauffage T3 (°C)", value=80.0)
-            cp = st.number_input("Cp [kJ/(kg·K)]", value=3.8)
-            x4 = st.number_input("Concentration finale visée x4 (0-1)", value=0.40)
-            lambda_v = st.number_input("Chaleur latente [kJ/kg]", value=2300.0)
-            
-        # Sauvegarde des paramètres dans la mémoire de session pour les utiliser dans l'onglet Résultats
+            T2 = st.number_input(t("T2"), value=20.0)
+            T3 = st.number_input(t("T3"), value=80.0)
+            cp = st.number_input(t("cp"), value=3.8)
+            x4 = st.number_input(t("x4"), value=0.40)
+            lambda_v = st.number_input(t("lambda_v"), value=2300.0)
         st.session_state.params = dict(m0=m0,x0_sol=x0_sol,residus=residus,mR=mR,xR=xR,T2=T2,T3=T3,cp=cp,x4=x4,lambda_v=lambda_v)
 
-    # --------------------------------------------------------------------------
-    # CALCULS DU BILAN MATIÈRE ET ÉNERGÉTIQUE (Exécuté à chaque rafraîchissement)
-    # --------------------------------------------------------------------------
-    # Récupération des paramètres (ou valeurs par défaut si l'utilisateur n'a rien touché)
+    # --- CALCULS ---
     p = st.session_state.get('params', dict(m0=1000.0,x0_sol=0.10,residus=20.0,mR=100.0,xR=0.40,T2=20.0,T3=80.0,cp=3.8,x4=0.40,lambda_v=2300.0))
-    
-    # Formules de la filtration
-    m1 = p['m0']-p['residus']
-    x1 = (p['m0']*p['x0_sol'])/m1 if m1>0 else 0
-    
-    # Formules du mélange
-    m2 = m1+p['mR']
-    x2 = (m1*x1+p['mR']*p['xR'])/m2 if m2>0 else 0
-    
-    # Formule du chauffage (Puissance thermique Q3)
+    m1 = p['m0']-p['residus']; x1 = (p['m0']*p['x0_sol'])/m1 if m1>0 else 0
+    m2 = m1+p['mR']; x2 = (m1*x1+p['mR']*p['xR'])/m2 if m2>0 else 0
     Q3 = m2*p['cp']*(p['T3']-p['T2'])/3600
-    
-    # Formules de l'évaporation
-    m4 = m2*x2/p['x4'] if p['x4']>0 else 0
-    mv = m2-m4
-    Q4 = mv*p['lambda_v']/3600
-    
-    # Formule du refroidissement
+    m4 = m2*x2/p['x4'] if p['x4']>0 else 0; mv = m2-m4; Q4 = mv*p['lambda_v']/3600
     Q5 = m4*p['cp']*(80-25)/3600
-    
-    # Calcul de l'erreur de bilan (doit être proche de 0)
     erreur = (p['m0']+p['mR'])-(p['residus']+mv+m4)
 
-    # --------------------------------------------------------------------------
-    # ONGLET 2 : AFFICHAGE DES RÉSULTATS ET GRAPHIQUES
-    # --------------------------------------------------------------------------
+    # --- ONGLET RÉSULTATS ---
     with tab_results:
-        st.subheader("Résultats en temps réel")
-        
-        # Ligne 1 : Métriques de débit et concentration
+        st.subheader(t("res_real_time"))
         r1,r2,r3 = st.columns(3)
-        r1.metric("Débit après filtration", f"{m1:,.2f} kg/h")
-        r2.metric("Concentration mélange", f"{x2*100:.2f} %")
-        r3.metric("Débit final", f"{m4:,.2f} kg/h")
-        
-        # Ligne 2 : Métriques d'énergie et d'évaporation
+        r1.metric(t("metric_m1"), f"{m1:,.2f} kg/h"); r2.metric(t("metric_x2"), f"{x2*100:.2f} %"); r3.metric(t("metric_m4"), f"{m4:,.2f} kg/h")
         r4,r5,r6 = st.columns(3)
-        r4.metric("Eau évaporée", f"{mv:,.2f} kg/h")
-        r5.metric("Puissance chauffage", f"{Q3:,.2f} kW")
-        r6.metric("Puissance évaporation", f"{Q4:,.2f} kW")
-        
-        # Ligne 3 : Refroidissement et erreur
+        r4.metric(t("metric_mv"), f"{mv:,.2f} kg/h"); r5.metric(t("metric_Q3"), f"{Q3:,.2f} kW"); r6.metric(t("metric_Q4"), f"{Q4:,.2f} kW")
         r7,r8 = st.columns(2)
-        r7.metric("Puissance refroidissement", f"{Q5:,.2f} kW")
-        r8.metric("Erreur bilan", f"{erreur:,.2f} kg/h", delta=f"{erreur:,.2f}", delta_color="inverse")
+        r7.metric(t("metric_Q5"), f"{Q5:,.2f} kW"); r8.metric(t("metric_err"), f"{erreur:,.2f} kg/h", delta=f"{erreur:,.2f}", delta_color="inverse")
 
         st.divider()
-        st.subheader("📈 Graphiques")
+        st.subheader(t("graphs"))
         gc1, gc2 = st.columns(2)
         
-        # Correction avec Pandas pour éviter les bugs de couleur Streamlit
-        # Le fait de passer par un DataFrame Pandas garantit que st.bar_chart reconnaît bien les séries
         with gc1:
-            df_debit = pd.DataFrame({"Étape": ["Initial","Filtré","Mélangé","Final"], "Débit":[p['m0'],m1,m2,m4]})
-            st.bar_chart(df_debit, x="Étape", y="Débit", color=ACCENT)
+            df_debit = pd.DataFrame({"Étape/Step": ["Initial","Filtré/Filtered","Mélangé/Mixed","Final"], "Débit/Flow":[p['m0'],m1,m2,m4]})
+            st.bar_chart(df_debit, x="Étape/Step", y="Débit/Flow", color=ACCENT)
         with gc2:
-            df_puissance = pd.DataFrame({"Opération":["Chauffage","Évaporation","Refroidissement"], "Puissance":[Q3,Q4,Q5]})
-            st.bar_chart(df_puissance, x="Opération", y="Puissance", color="#e74c3c")
+            df_puissance = pd.DataFrame({"Opération/Operation":["Chauffage/Heat","Évaporation/Evap","Refroidissement/Cool"], "Puissance/Power":[Q3,Q4,Q5]})
+            st.bar_chart(df_puissance, x="Opération/Operation", y="Puissance/Power", color="#e74c3c")
             
-        # Barre de progression pour l'atteinte de l'objectif
-        st.write("**Atteinte de l'objectif**")
+        st.write(t("obj_reach"))
         st.progress(min(x2/p['x4'] if p['x4']>0 else 1.0, 1.0))
-        st.caption(f"Objectif : {p['x4']*100}% | Actuel : {x2*100:.2f}%")
+        st.caption(f"{t('obj_text')} : {p['x4']*100}% | Actuel/Current : {x2*100:.2f}%")
 
-        st.divider()
-        st.subheader("📝 Conclusion & Recommandations")
+    # --- ONGLET CONCLUSION ---
+    with tab_conclusion:
+        st.subheader(t("concl_title"))
         
-        # Appel de la fonction pour générer les commentaires intelligents
         for c in generate_conclusion(m1,m2,m4,mv,Q3,Q4,Q5,x2,p['x4'],erreur):
             st.markdown(f"- {c}")
             
-        # Message de synthèse final
-        if abs(erreur)<=1 and x2>=p['x4']:
-            st.success("✅ En résumé : Le procédé est valide, vous pouvez passer à l'étape suivante.")
-        else:
-            st.warning("⚠️ En résumé : Corrigez les points ci-dessus avant de valider le procédé.")
-
-    # --------------------------------------------------------------------------
-    # ONGLET 3 : ASSISTANT VIRTUEL (CHATBOT)
-    # --------------------------------------------------------------------------
-    with tab_chat:
-        st.subheader("🤖 Assistant Virtuel")
+        st.divider()
         
-        # Initialisation de l'historique des messages
+        if abs(erreur)<=1 and x2>=p['x4']:
+            st.success(f"✅ {t('summary')} : " + ("Le procédé est valide." if st.session_state.lang=='FR' else "The process is valid."))
+        else:
+            st.warning(f"⚠️ {t('summary')} : " + ("Corrigez les points ci-dessus." if st.session_state.lang=='FR' else "Fix the points above."))
+
+    # --- ONGLET ASSISTANT ---
+    with tab_chat:
+        st.subheader(t("chat_title"))
         if "messages" not in st.session_state: 
-            st.session_state.messages=[{"role":"assistant","content":"Bonjour ! Une question ?"}]
+            welcome_msg = "Bonjour ! Une question ?" if st.session_state.lang == 'FR' else "Hello! Any questions?"
+            st.session_state.messages=[{"role":"assistant","content":welcome_msg}]
             
-        # Affichage de l'historique de la conversation
         for m in st.session_state.messages:
-            with st.chat_message(m["role"]): 
-                st.markdown(m["content"])
-                
-        # Zone de saisie pour l'utilisateur
-        if prompt := st.chat_input("Posez votre question..."):
-            # Ajout du message utilisateur
+            with st.chat_message(m["role"]): st.markdown(m["content"])
+            
+        if prompt := st.chat_input(t("chat_placeholder")):
             st.session_state.messages.append({"role":"user","content":prompt})
-            with st.chat_message("user"): 
-                st.markdown(prompt)
-                
-            # Génération et ajout de la réponse du bot
+            with st.chat_message("user"): st.markdown(prompt)
             resp = generate_bot_response(prompt)
             st.session_state.messages.append({"role":"assistant","content":resp})
-            with st.chat_message("assistant"): 
-                st.markdown(resp)
+            with st.chat_message("assistant"): st.markdown(resp)
 
 # ==============================================================================
-# POINT D'ENTRÉE PRINCIPAL DE L'APPLICATION
+# 8. LANCEMENT DE L'APPLICATION
 # ==============================================================================
-# Vérification de l'état de connexion de l'utilisateur
-if 'logged_in' not in st.session_state: 
-    st.session_state['logged_in']=False
+if 'logged_in' not in st.session_state: st.session_state['logged_in']=False
 
-# Si l'utilisateur n'est pas connecté, on affiche la page de connexion
 if not st.session_state['logged_in']: 
     auth_page()
-# Sinon, on affiche directement le simulateur
 else: 
     simulator_page()
