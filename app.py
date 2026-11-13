@@ -5,16 +5,18 @@ from datetime import datetime
 st.set_page_config(page_title="ProcessLab", layout="wide", page_icon="🧪", initial_sidebar_state="collapsed")
 
 # ---------- ÉTAT ----------
-DEFAULTS = {"theme_mode":"light","lang":"FR","page":"landing","logged_in":False,"messages":[],
+DEFAULTS = {"theme_mode":"dark","lang":"FR","page":"landing","logged_in":False,"messages":[],"auth_tab":"login",
     "params":{"m0":1000.0,"x0_sol":0.10,"residus":20.0,"mR":100.0,"xR":0.40,"T2":20.0,
               "T3":80.0,"cp":3.8,"x4":0.40,"lambda_v":2300.0}}
 for k,v in DEFAULTS.items():
-    st.session_state.setdefault(k, v.copy() if isinstance(v,dict) else v)
+    if k not in st.session_state:
+        st.session_state[k] = dict(v) if isinstance(v,dict) else list(v) if isinstance(v,list) else v
 
 T = {
-"FR":{"sub":"Filtration • Chauffage • Évaporation","theme":"☀️ Clair","lang":"🇬🇧 English",
-  "login":"🔑 Se connecter","signup":"📝 Créer un compte","email":"📧 Email","pass":"🔒 Mot de passe",
+"FR":{"sub":"Filtration • Chauffage • Évaporation","lang":"🇪🇬 English",
+  "login":"Se connecter","signup":"Créer un compte","email":"📧 Email","pass":"🔒 Mot de passe",
   "confirm":"🔒 Confirmer","user":"👤 Nom d'utilisateur","login_b":"Se connecter →","signup_b":"Créer mon compte ✨",
+  "login_tab":"🔑 Se connecter","signup_tab":"📝 Créer un compte",
   "hello":"Bonjour","logout":"🚪 Se déconnecter","info":"Modifiez les paramètres puis consultez les résultats.",
   "sim_t":"Simulateur de bilan matière et énergétique","sim_c":"Ajustez les paramètres pour visualiser les résultats.",
   "t_par":"⚙️ Paramètres","t_res":"📊 Résultats","t_con":"📝 Conclusion","t_chat":"🤖 Assistant",
@@ -29,16 +31,18 @@ T = {
   "err_email":"Email invalide.","err_pass":"Mots de passe différents.","err_len":"Minimum 8 caractères.",
   "err_exist":"Email déjà utilisé.","succ":"Compte créé !","err_c":"Erreur de création.",
   "l_t":"Simulez votre procédé industriel","l_s":"Calculez filtration, chauffage, évaporation. Bilans, graphiques, recommandations.",
-  "cta":"🚀 Commencer","cta_l":"Déjà un compte ? Se connecter","f1":"⚡ Calculs rapides","f1_d":"Résultats instantanés.",
+  "cta":"Commencer","cta_l":"Se connecter","f1":"⚡ Calculs rapides","f1_d":"Résultats instantanés.",
   "f2":"📊 Tableaux et graphiques","f2_d":"Suivez débits et puissances.","f3":"🤖 Assistant","f3_d":"Explications des calculs.",
   "f4":"📄 Rapport PDF","f4_d":"Export structuré.","how":"Comment ça marche ?","s1":"1. Créez un compte","s1_d":"Inscrivez-vous.",
   "s2":"2. Saisissez les paramètres","s2_d":"Débits, fractions, températures.","s3":"3. Consultez le rapport","s3_d":"Analysez et exportez.",
   "pdf":"📄 Télécharger le rapport PDF","back":"← Retour à l'accueil","proc":"Données d'entrée du procédé",
   "hyp":"Hypothèse : les résidus de filtration sont supposés exempts de soluté."},
-"EN":{"sub":"Filtration • Heating • Evaporation","theme":"☀️ Light","lang":"🇫🇷 Français",
-  "login":"🔑 Login","signup":"📝 Create account","email":"📧 Email","pass":"🔒 Password","confirm":"🔒 Confirm",
-  "user":"👤 Username","login_b":"Login →","signup_b":"Create account ✨","hello":"Hello","logout":"🚪 Log out",
-  "info":"Edit parameters and view results.","sim_t":"Material and energy balance simulator","sim_c":"Adjust parameters.",
+"EN":{"sub":"Filtration • Heating • Evaporation","lang":"🇫🇷 Français",
+  "login":"Login","signup":"Sign up","email":"📧 Email","pass":"🔒 Password","confirm":"🔒 Confirm",
+  "user":"👤 Username","login_b":"Login →","signup_b":"Create account ✨",
+  "login_tab":"🔑 Login","signup_tab":"📝 Sign up",
+  "hello":"Hello","logout":"🚪 Log out","info":"Edit parameters and view results.",
+  "sim_t":"Material and energy balance simulator","sim_c":"Adjust parameters.",
   "t_par":"⚙️ Parameters","t_res":"📊 Results","t_con":"📝 Conclusion","t_chat":"🤖 Assistant",
   "m0":"Initial flow m₀ (kg/h)","x0":"Fraction x₀ (0–1)","res":"Filtration residues (kg/h)","mR":"Added flow mR (kg/h)",
   "xR":"Fraction xR (0–1)","T2":"Inlet temperature T₂ (°C)","T3":"Temperature after heating T₃ (°C)",
@@ -51,13 +55,21 @@ T = {
   "err_email":"Invalid email.","err_pass":"Passwords don't match.","err_len":"Min 8 characters.",
   "err_exist":"Email already in use.","succ":"Account created!","err_c":"Creation error.",
   "l_t":"Simulate your industrial process","l_s":"Calculate filtration, heating, evaporation. Balances, charts, recommendations.",
-  "cta":"🚀 Get started","cta_l":"Already have an account? Login","f1":"⚡ Fast calculations","f1_d":"Instant results.",
+  "cta":"Get started","cta_l":"Login","f1":"⚡ Fast calculations","f1_d":"Instant results.",
   "f2":"📊 Tables and charts","f2_d":"Track flows and power.","f3":"🤖 Assistant","f3_d":"Explanations of calculations.",
   "f4":"📄 PDF report","f4_d":"Structured export.","how":"How does it work?","s1":"1. Create account","s1_d":"Sign up.",
   "s2":"2. Enter parameters","s2_d":"Flows, fractions, temperatures.","s3":"3. View report","s3_d":"Analyze and export.",
   "pdf":"📄 Download PDF report","back":"← Back to home","proc":"Process input data",
   "hyp":"Assumption: filtration residues contain no solute."}}
-def t(k): return T[st.session_state.lang].get(k,k)
+
+def theme_label():
+    dk = st.session_state.theme_mode == "dark"
+    if st.session_state.lang == "FR": return "☀️ Clair" if dk else "🌙 Sombre"
+    return "☀️ Light" if dk else "🌙 Dark"
+
+def t(k):
+    if k == "theme": return theme_label()
+    return T[st.session_state.lang].get(k,k)
 
 # ---------- DB ----------
 def init_db():
@@ -87,7 +99,7 @@ if dk:
          "radial-gradient(ellipse at 92% 18%,rgba(244,184,208,.20),transparent 30%),"
          "radial-gradient(ellipse at 82% 88%,rgba(232,198,107,.16),transparent 32%),"
          "linear-gradient(135deg,#1A1120 0%,#1E1526 48%,#241A1A 100%)")
-    HBG="linear-gradient(118deg,rgba(37,26,46,.97) 0%,rgba(42,30,52,.96) 48%,rgba(50,36,60,.96) 100%)"
+    HBG="linear-gradient(118deg,rgba(37,26,46,.97),rgba(42,30,52,.96) 48%,rgba(50,36,60,.96))"
     FBG="linear-gradient(145deg,rgba(37,26,46,.98),rgba(35,24,44,.96))"; MBG="linear-gradient(145deg,#251A2E,#1E1526)"
     CM,CL,CC,CG="#C99FE0","#F4B8D0","#E8A0BF","#E8C66B"; HB="rgba(201,159,224,.25)"
     FSH="0 12px 30px rgba(0,0,0,.35)"; FSHH="0 17px 34px rgba(201,159,224,.28)"
@@ -127,9 +139,14 @@ section[data-testid="stSidebar"]{{background:{CRD};border-right:1px solid {BRD};
 div[data-testid="stTextInput"] input,div[data-testid="stNumberInput"] input{{background:{INP}!important;color:{TXT}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;}}
 div[data-testid="stTextInput"] input:focus,div[data-testid="stNumberInput"] input:focus{{border-color:{CL}!important;box-shadow:0 0 0 3px {CL}22!important;}}
 div[data-testid="stTextInput"] label,div[data-testid="stNumberInput"] label{{color:{TXT}!important;font-weight:600;font-size:13px;}}
+/* Boutons par défaut (violet) */
 .stButton>button,.stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(155,111,191,.32)!important;transition:all .18s ease;}}
 .stButton>button:hover,.stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(155,111,191,.45)!important;transform:translateY(-1px);}}
-section[data-testid="stSidebar"] .stButton>button{{background:linear-gradient(110deg,{ACC},{CL})!important;box-shadow:0 5px 14px rgba(155,111,191,.28)!important;}}
+/* ⭐ Boutons PRIMAIRES = GOLD PULSANT (login ultra visible) */
+.stButton>button[kind="primary"]{{background:linear-gradient(110deg,{CG},{CC} 55%,{CL})!important;color:#2D1B33!important;border:0!important;font-weight:800!important;box-shadow:0 7px 18px rgba(212,162,76,.4),0 0 0 0 rgba(212,162,76,.5)!important;animation:pulseGold 2.5s ease-in-out infinite;}}
+.stButton>button[kind="primary"]:hover{{animation:none;background:linear-gradient(110deg,{CC},{CG} 55%,{CL})!important;box-shadow:0 10px 26px rgba(212,162,76,.55)!important;transform:translateY(-1px);}}
+section[data-testid="stSidebar"] .stButton>button{{background:linear-gradient(110deg,{ACC},{CL})!important;}}
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]{{background:linear-gradient(110deg,{CG},{CC})!important;color:#2D1B33!important;}}
 .stDownloadButton>button{{background:{SOFT}!important;color:{ACC}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;font-weight:700;}}
 button[data-baseweb="tab"]{{color:{MUT}!important;font-weight:600;padding:12px 16px!important;}}
 button[data-baseweb="tab"][aria-selected="true"]{{color:{ACC}!important;border-bottom:2px solid {ACC}!important;background:transparent!important;}}
@@ -164,7 +181,8 @@ div[data-testid="stAlert"]{{border-radius:14px;}} #MainMenu{{visibility:hidden;}
 @keyframes floatAround{{0%,100%{{transform:translate3d(0,0,0) rotate(-8deg) scale(1);}}50%{{transform:translate3d(12px,-24px,0) rotate(12deg) scale(1.08);}}}}
 @keyframes orbDrift{{0%,100%{{transform:translateY(0) scale(.85);opacity:.55;}}50%{{transform:translateY(-26px) scale(1.4);opacity:1;}}}}
 @keyframes twinkle{{0%,100%{{transform:scale(.8);opacity:.45;}}50%{{transform:scale(1.2) rotate(18deg);opacity:1;}}}}
-@media(prefers-reduced-motion:reduce){{.lab-symbol,.lab-orb,.hero:before{{animation:none!important;}}}}
+@keyframes pulseGold{{0%,100%{{box-shadow:0 7px 18px rgba(212,162,76,.4),0 0 0 0 rgba(212,162,76,.5);}}50%{{box-shadow:0 7px 22px rgba(212,162,76,.55),0 0 0 10px rgba(212,162,76,0);}}}}
+@media(prefers-reduced-motion:reduce){{.lab-symbol,.lab-orb,.hero:before,.stButton>button[kind="primary"]{{animation:none!important;}}}}
 @media(max-width:700px){{.lab-symbol{{opacity:.18!important;}} .lab-symbol.s1,.lab-symbol.s3,.lab-symbol.s5,.lab-symbol.s9{{display:none;}}}}
 </style>
 <div class="floating-lab-art" aria-hidden="true">
@@ -176,16 +194,24 @@ div[data-testid="stAlert"]{{border-radius:14px;}} #MainMenu{{visibility:hidden;}
 </div>""", unsafe_allow_html=True)
 
 # ---------- UI HELPERS ----------
-def logo(): return f'<div style="display:flex;align-items:center;gap:12px;padding:8px"><div style="width:46px;height:46px;border-radius:15px;background:{SOFT};display:grid;place-items:center;font-size:23px">⚗️</div><div style="line-height:1.12;text-align:left"><div style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;letter-spacing:-.7px;color:{TXT}">Process<span style="color:{ACC}">Lab</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:{MUT};margin-top:4px">PROCESS LAB · INDUSTRIE</div></div></div>'
+def logo(): return f'<div style="display:flex;align-items:center;gap:12px;padding:4px"><div style="width:46px;height:46px;border-radius:15px;background:{SOFT};display:grid;place-items:center;font-size:23px">⚗️</div><div style="line-height:1.12;text-align:left"><div style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;letter-spacing:-.7px;color:{TXT}">Process<span style="color:{ACC}">Lab</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:{MUT};margin-top:4px">PROCESS LAB · INDUSTRIE</div></div></div>'
 
 def toggle_lang(): st.session_state.lang="EN" if st.session_state.lang=="FR" else "FR"; st.rerun()
 def toggle_theme(): st.session_state.theme_mode="light" if st.session_state.theme_mode=="dark" else "dark"; st.rerun()
-def header_ctrl():
-    c1,c2=st.columns(2)
-    with c1:
-        if st.button(t("lang"),use_container_width=True): toggle_lang()
+
+def top_bar():
+    """Barre supérieure landing/auth avec bouton login ultra visible."""
+    c1,c2,c3,c4 = st.columns([3.5,1,1,1.6])
+    with c1: st.markdown(logo(), unsafe_allow_html=True)
     with c2:
-        if st.button(t("theme"),use_container_width=True): toggle_theme()
+        if st.button(t("theme"), key="tb_th", use_container_width=True): toggle_theme()
+    with c3:
+        if st.button(t("lang"), key="tb_lg", use_container_width=True): toggle_lang()
+    with c4:
+        if st.button(f"🔑 {t('login')}", key="tb_li", use_container_width=True, type="primary"):
+            st.session_state.auth_tab = "login"
+            st.session_state.page = "auth"
+            st.rerun()
 
 # ---------- CALCULS ----------
 def calc(p):
@@ -223,8 +249,8 @@ def concl(r,p):
     if r["Q3"]>=0: c.append(f"Puissance thermique de chauffage : {r['Q3']:.2f} kW.")
     return c
 
-# ---------- PDF ----------
-def make_pdf(params, res, conc, user):
+# ---------- PDF ENRICHI ----------
+def make_pdf(params, res, conc, user, raw):
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
     from reportlab.lib.pagesizes import A4
@@ -232,41 +258,104 @@ def make_pdf(params, res, conc, user):
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from xml.sax.saxutils import escape
-    buf=BytesIO(); doc=SimpleDocTemplate(buf,pagesize=A4,rightMargin=17*mm,leftMargin=17*mm,topMargin=25*mm,bottomMargin=18*mm)
-    purple=colors.HexColor("#8B5A9E"); navy=colors.HexColor("#2D1B33"); pale=colors.HexColor("#F5EBF5")
-    grey=colors.HexColor("#7A6480"); gold=colors.HexColor("#D4A24C"); S=getSampleStyleSheet()
-    S.add(ParagraphStyle(name="RT",parent=S["Title"],fontName="Helvetica-Bold",fontSize=19,leading=23,textColor=navy,alignment=TA_CENTER,spaceAfter=5))
-    S.add(ParagraphStyle(name="ST",parent=S["Heading2"],fontName="Helvetica-Bold",fontSize=12,leading=15,textColor=purple,spaceBefore=12,spaceAfter=7))
-    S.add(ParagraphStyle(name="SC",parent=S["BodyText"],fontName="Helvetica",fontSize=8.5,leading=11,textColor=navy))
-    S.add(ParagraphStyle(name="SCH",parent=S["BodyText"],fontName="Helvetica-Bold",fontSize=8.5,leading=11,textColor=colors.white))
-    S.add(ParagraphStyle(name="RB",parent=S["BodyText"],fontSize=9.5,leading=14,textColor=navy,spaceAfter=5))
-    def cell(v,h=False): return Paragraph(escape(str(v)).replace("\n","<br/>"),S["SCH" if h else "SC"])
-    def tbl(rows,w=None):
-        data=[[cell(v,i==0) for v in row] for i,row in enumerate(rows)]
-        tb=Table(data,colWidths=w,repeatRows=1,hAlign="LEFT")
-        tb.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),purple),("TEXTCOLOR",(0,0),(-1,0),colors.white),
-            ("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,pale]),("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#EBDBEB")),
-            ("VALIGN",(0,0),(-1,-1),"MIDDLE"),("LEFTPADDING",(0,0),(-1,-1),7),("RIGHTPADDING",(0,0),(-1,-1),7),
-            ("TOPPADDING",(0,0),(-1,-1),6),("BOTTOMPADDING",(0,0),(-1,-1),6)]))
+    p = raw["p"]; r = raw["r"]
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=17*mm, leftMargin=17*mm, topMargin=25*mm, bottomMargin=22*mm,
+        title="Rapport de simulation - ProcessLab", author="ProcessLab")
+    purple=colors.HexColor("#8B5A9E"); violet2=colors.HexColor("#A972BE")
+    rose=colors.HexColor("#E8A0BF"); rose_gold=colors.HexColor("#C97B9E")
+    gold=colors.HexColor("#D4A24C"); navy=colors.HexColor("#2D1B33")
+    pale=colors.HexColor("#F5EBF5"); grey=colors.HexColor("#7A6480")
+    S = getSampleStyleSheet()
+    S.add(ParagraphStyle(name="RT", parent=S["Title"], fontName="Helvetica-Bold", fontSize=20, leading=24, textColor=navy, alignment=TA_CENTER, spaceAfter=5))
+    S.add(ParagraphStyle(name="ST", parent=S["Heading2"], fontName="Helvetica-Bold", fontSize=12, leading=15, textColor=purple, spaceBefore=14, spaceAfter=8))
+    S.add(ParagraphStyle(name="SUB", parent=S["BodyText"], fontSize=9, leading=12, textColor=grey, alignment=TA_CENTER, spaceAfter=10))
+    S.add(ParagraphStyle(name="SC", parent=S["BodyText"], fontName="Helvetica", fontSize=8.5, leading=11, textColor=navy))
+    S.add(ParagraphStyle(name="SCH", parent=S["BodyText"], fontName="Helvetica-Bold", fontSize=8.5, leading=11, textColor=colors.white))
+    S.add(ParagraphStyle(name="SCB", parent=S["BodyText"], fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=navy))
+    S.add(ParagraphStyle(name="RB", parent=S["BodyText"], fontSize=9.5, leading=14, textColor=navy, spaceAfter=5))
+    def cell(v,h=False): return Paragraph(escape(str(v)).replace("\n","<br/>"), S["SCH" if h else "SC"])
+    def cellb(v): return Paragraph(escape(str(v)), S["SCB"])
+    def tbl(rows, widths=None, header_color=purple):
+        data = [[cell(v, i==0) for v in row] for i, row in enumerate(rows)]
+        tb = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT")
+        tb.setStyle(TableStyle([
+            ("BACKGROUND",(0,0),(-1,0),header_color),("TEXTCOLOR",(0,0),(-1,0),colors.white),
+            ("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,pale]),
+            ("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#EBDBEB")),
+            ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
+            ("LEFTPADDING",(0,0),(-1,-1),7),("RIGHTPADDING",(0,0),(-1,-1),7),
+            ("TOPPADDING",(0,0),(-1,-1),6),("BOTTOMPADDING",(0,0),(-1,-1),6),
+        ]))
         return tb
     def deco(cv,d):
         cv.saveState(); w,h=A4
         cv.setFillColor(purple); cv.rect(0,h-13*mm,w,13*mm,fill=1,stroke=0)
-        cv.setFillColor(colors.white); cv.setFont("Helvetica-Bold",9); cv.drawString(17*mm,h-8.5*mm,"SIMULATEUR PRO V2  |  RAPPORT DE PROCÉDÉ")
-        cv.setStrokeColor(gold); cv.setLineWidth(0.8); cv.line(17*mm,13*mm,w-17*mm,13*mm)
+        cv.setFillColor(gold); cv.rect(0,h-14*mm,w,1*mm,fill=1,stroke=0)
+        cv.setFillColor(colors.white); cv.setFont("Helvetica-Bold",9)
+        cv.drawString(17*mm,h-8.5*mm,"PROCESSLAB  |  RAPPORT DE PROCÉDÉ")
+        cv.drawRightString(w-17*mm,h-8.5*mm,"SIMULATEUR PRO V2")
+        cv.setStrokeColor(rose); cv.setLineWidth(0.5); cv.line(17*mm,15*mm,w-17*mm,15*mm)
         cv.setFillColor(grey); cv.setFont("Helvetica",7.5)
-        cv.drawString(17*mm,8*mm,"Rapport généré automatiquement - Usage pédagogique")
-        cv.drawRightString(w-17*mm,8*mm,f"Page {d.page}"); cv.restoreState()
-    story=[Spacer(1,5*mm),Paragraph("RAPPORT DE SIMULATION",S["RT"]),
-        Paragraph("Filtration • Mélange • Chauffage • Évaporation",S["RB"]),Spacer(1,3*mm),
-        tbl([["Informations générales","Valeur"],["Utilisateur",user],["Date",datetime.now().strftime("%d/%m/%Y à %H:%M")],["Application","Simulateur Pro V2"]],[65*mm,105*mm]),
-        Paragraph("1. Paramètres opératoires",S["ST"]),tbl([["Paramètre","Valeur"]]+[[k,v] for k,v in params.items()],[85*mm,85*mm]),
-        Paragraph("2. Bilan matière",S["ST"]),tbl([["Grandeur","Résultat"]]+[[k,v] for k,v in res["matter"].items()],[85*mm,85*mm]),
-        Paragraph("3. Bilan énergétique",S["ST"]),tbl([["Grandeur","Résultat"]]+[[k,v] for k,v in res["energy"].items()],[85*mm,85*mm]),
-        Paragraph("4. Conclusions et recommandations",S["ST"])]
-    for x in conc: story.append(Paragraph("• "+escape(str(x)),S["RB"]))
-    story+=[Spacer(1,5*mm),Paragraph("<b>Note :</b> les résidus sont supposés exempts de soluté. Bilan calculé sur les mêmes relations de débit ; fermeture numérique ≠ validation expérimentale.",S["RB"])]
-    doc.build(story,onFirstPage=deco,onLaterPages=deco); buf.seek(0); return buf.getvalue()
+        cv.drawString(17*mm,10*mm,"Document généré automatiquement - Usage pédagogique")
+        cv.drawRightString(w-17*mm,10*mm,f"Page {d.page}")
+        cv.restoreState()
+    story=[
+        Spacer(1,5*mm),
+        Paragraph("RAPPORT DE SIMULATION", S["RT"]),
+        Paragraph("Filtration • Mélange • Chauffage • Évaporation", S["SUB"]),
+        Spacer(1,3*mm),
+        tbl([["Informations générales","Valeur"],["Utilisateur",user],
+             ["Date de génération",datetime.now().strftime("%d/%m/%Y à %H:%M")],
+             ["Application","ProcessLab - Simulateur Pro V2"],
+             ["Statut","Simulation valide" if abs(r["error"])<1e-6 else "Écart détecté"]],[65*mm,105*mm]),
+    ]
+    # KPI mini-grid
+    story.append(Spacer(1,4*mm)); story.append(Paragraph("Résultats clés", S["ST"]))
+    kpi = Table([
+        [cell("m₄ final",True),cell("x₂ concentration",True),cell("mv évaporé",True)],
+        [cell(f"{r['m4']:.1f} kg/h"),cell(f"{r['x2']*100:.1f} %"),cell(f"{r['mv']:.1f} kg/h")],
+        [cell("Q₃ chauffage",True),cell("Q₄ évaporation",True),cell("Écart bilan",True)],
+        [cell(f"{r['Q3']:.1f} kW"),cell(f"{r['Q4']:.1f} kW"),cell(f"{r['error']:.4f} kg/h")],
+    ], colWidths=[56*mm]*3)
+    kpi.setStyle(TableStyle([
+        ("BACKGROUND",(0,0),(0,0),purple),("BACKGROUND",(1,0),(1,0),violet2),("BACKGROUND",(2,0),(2,0),rose_gold),
+        ("BACKGROUND",(0,2),(0,2),purple),("BACKGROUND",(1,2),(1,2),violet2),("BACKGROUND",(2,2),(2,2),rose_gold),
+        ("BACKGROUND",(0,1),(-1,1),colors.white),("BACKGROUND",(0,3),(-1,3),colors.white),
+        ("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#EBDBEB")),
+        ("ALIGN",(0,0),(-1,-1),"CENTER"),("VALIGN",(0,0),(-1,-1),"MIDDLE"),
+        ("TOPPADDING",(0,0),(-1,-1),5),("BOTTOMPADDING",(0,0),(-1,-1),5),
+    ]))
+    story.append(kpi)
+    story.append(Paragraph("1. Paramètres opératoires", S["ST"]))
+    story.append(tbl([["Paramètre","Valeur"]]+[[k,v] for k,v in params.items()],[85*mm,85*mm]))
+    story.append(Paragraph("2. Bilan matière", S["ST"]))
+    story.append(tbl([["Grandeur","Résultat"]]+[[k,v] for k,v in res["matter"].items()],[85*mm,85*mm]))
+    story.append(Paragraph("3. Bilan énergétique", S["ST"]))
+    story.append(tbl([["Grandeur","Résultat"]]+[[k,v] for k,v in res["energy"].items()],[85*mm,85*mm],header_color=rose_gold))
+    if "flow" in res:
+        story.append(Paragraph("4. Schéma du procédé", S["ST"]))
+        story.append(tbl(res["flow"]))
+    if "formulas" in res:
+        story.append(Paragraph("5. Formules utilisées", S["ST"]))
+        story.append(tbl(res["formulas"], header_color=rose_gold))
+    story.append(Paragraph("6. Conclusions et recommandations", S["ST"]))
+    for x in conc: story.append(Paragraph("• " + escape(str(x)), S["RB"]))
+    story.append(Paragraph("7. Validation du rapport", S["ST"]))
+    sig = Table([
+        [cell("Rédigé par",True),cell("Vérifié par",True),cell("Approuvé par",True)],
+        [cell(user),cell("________________"),cell("________________")],
+        [cell("Date : "+datetime.now().strftime("%d/%m/%Y")),cell("Date : ________"),cell("Date : ________")],
+    ], colWidths=[56*mm]*3)
+    sig.setStyle(TableStyle([
+        ("BACKGROUND",(0,0),(-1,0),purple),("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#EBDBEB")),
+        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),("TOPPADDING",(0,0),(-1,-1),8),("BOTTOMPADDING",(0,0),(-1,-1),8),
+    ]))
+    story.append(sig)
+    story.append(Spacer(1,5*mm))
+    story.append(Paragraph("<b>Note méthodologique :</b> les résidus sont supposés exempts de soluté. Le bilan est calculé sur les mêmes relations de débit ; la fermeture numérique ne constitue pas une validation expérimentale indépendante.", S["RB"]))
+    doc.build(story, onFirstPage=deco, onLaterPages=deco)
+    buf.seek(0); return buf.getvalue()
 
 # ---------- CHATBOT ----------
 def clean(s): return re.sub(r"\s+"," ",re.sub(r"[^a-z0-9\s]"," ",unicodedata.normalize("NFD",s.lower()).encode("ascii","ignore").decode())).strip()
@@ -286,32 +375,36 @@ def bot(q):
 
 # ---------- PAGES ----------
 def landing():
-    header_ctrl(); st.markdown(logo(),unsafe_allow_html=True)
+    top_bar()
     st.markdown(f'<div class="hero"><span class="hero-badge">CHIMIE · GÉNIE DES PROCÉDÉS</span><h1 style="font-size:34px;margin:14px 0 8px">{t("l_t")}</h1><p>{t("l_s")}</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;position:relative;z-index:1"><span class="hero-badge">01 · Filtration</span><span class="hero-badge">02 · Chauffage</span><span class="hero-badge">03 · Évaporation</span></div></div>',unsafe_allow_html=True)
     c1,c2=st.columns(2)
     with c1:
-        if st.button(t("cta"),use_container_width=True): st.session_state.page="auth"; st.rerun()
+        if st.button(f"🚀 {t('cta')}", key="cta_start", use_container_width=True):
+            st.session_state.auth_tab="signup"; st.session_state.page="auth"; st.rerun()
     with c2:
-        if st.button(t("cta_l"),use_container_width=True): st.session_state.page="auth"; st.rerun()
+        if st.button(f"🔑 {t('cta_l')}", key="cta_login", use_container_width=True, type="primary"):
+            st.session_state.auth_tab="login"; st.session_state.page="auth"; st.rerun()
     st.write("")
     for col,(a,b) in zip(st.columns(4),[(t("f1"),t("f1_d")),(t("f2"),t("f2_d")),(t("f3"),t("f3_d")),(t("f4"),t("f4_d"))]):
         with col: st.markdown(f'<div class="feature"><h3>{a}</h3><p>{b}</p></div>',unsafe_allow_html=True)
     st.write(""); st.markdown(f"<h2 style='text-align:center'>{t('how')}</h2>",unsafe_allow_html=True)
     for col,(a,b) in zip(st.columns(3),[(t("s1"),t("s1_d")),(t("s2"),t("s2_d")),(t("s3"),t("s3_d"))]):
         with col: st.markdown(f'<div class="feature"><h3>{a}</h3><p>{b}</p></div>',unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center;color:{MUT};margin-top:35px'>Simulateur Pro V2 • Apprentissage du génie des procédés</p>",unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;color:{MUT};margin-top:35px'>ProcessLab • Apprentissage du génie des procédés</p>",unsafe_allow_html=True)
 
 def auth():
-    if st.button(t("back")): st.session_state.page="landing"; st.rerun()
+    top_bar()
+    if st.button(t("back"), key="back_btn"): st.session_state.page="landing"; st.rerun()
     _,mid,_=st.columns([1,1.6,1])
     with mid:
-        st.markdown(logo(),unsafe_allow_html=True); header_ctrl()
-        tl,ts=st.tabs([t("login"),t("signup")])
+        st.markdown(logo(),unsafe_allow_html=True)
+        tl,ts=st.tabs([t("login_tab"),t("signup_tab")])
         with tl:
+            if st.session_state.get("auth_tab")=="signup": st.caption(f"👆 Onglet 📝 {t('signup_tab')} pour créer un compte")
             with st.form("lf"):
-                e=st.text_input(t("email"),placeholder="exemple@email.com")
-                p=st.text_input(t("pass"),type="password")
-                s=st.form_submit_button(t("login_b"),use_container_width=True)
+                e=st.text_input(t("email"),placeholder="exemple@email.com",key="lf_email")
+                p=st.text_input(t("pass"),type="password",key="lf_pass")
+                s=st.form_submit_button(t("login_b"),use_container_width=True,type="primary")
             if s:
                 if not e or not p: st.error(t("err_fill"))
                 else:
@@ -319,11 +412,12 @@ def auth():
                     if u: st.session_state.update(logged_in=True,username=u,page="app"); st.rerun()
                     else: st.error(t("err_auth"))
         with ts:
+            if st.session_state.get("auth_tab")=="login": st.caption(f"👆 Onglet 🔑 {t('login_tab')} pour se connecter")
             with st.form("sf"):
-                u=st.text_input(t("user"))
-                e=st.text_input(t("email"),placeholder="exemple@email.com")
-                p=st.text_input(t("pass"),type="password")
-                c=st.text_input(t("confirm"),type="password")
+                u=st.text_input(t("user"),key="sf_user")
+                e=st.text_input(t("email"),placeholder="exemple@email.com",key="sf_email")
+                p=st.text_input(t("pass"),type="password",key="sf_pass")
+                c=st.text_input(t("confirm"),type="password",key="sf_conf")
                 s=st.form_submit_button(t("signup_b"),use_container_width=True)
             if s:
                 if not all([u,e,p,c]): st.error(t("err_req"))
@@ -337,10 +431,10 @@ def simulator():
     with st.sidebar:
         st.markdown(logo(),unsafe_allow_html=True)
         st.markdown(f"**{t('hello')}, {st.session_state.get('username','User')}**")
-        if st.button(t("lang"),use_container_width=True): toggle_lang()
-        if st.button(t("theme"),use_container_width=True): toggle_theme()
+        if st.button(t("lang"),key="sb_lg",use_container_width=True): toggle_lang()
+        if st.button(t("theme"),key="sb_th",use_container_width=True): toggle_theme()
         st.info(t("info"))
-        if st.button(t("logout"),use_container_width=True):
+        if st.button(t("logout"),key="sb_lo",use_container_width=True):
             st.session_state.update(logged_in=False,page="landing",messages=[]); st.rerun()
     st.markdown(f'<div class="hero"><span class="hero-badge">ESPACE DE SIMULATION</span><h1 style="margin:10px 0 6px">{t("sim_t")}</h1><p>{t("sim_c")}</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;position:relative;z-index:1"><span class="hero-badge">Filtration</span><span class="hero-badge">Mélange</span><span class="hero-badge">Chauffage</span><span class="hero-badge">Évaporation</span></div></div>',unsafe_allow_html=True)
     tp,tr,tc,tch=st.tabs([t("t_par"),t("t_res"),t("t_con"),t("t_chat")])
@@ -396,8 +490,31 @@ def simulator():
         if not warn and r["x2"]>=p["x4"]: st.success("Cible atteinte ou dépassée.")
         elif not warn: st.warning("Cible non atteinte.")
         params_pdf={"m₀":f"{p['m0']:.2f} kg/h","x₀":f"{p['x0_sol']:.4f}","Résidus":f"{p['residus']:.2f} kg/h","mR":f"{p['mR']:.2f} kg/h","xR":f"{p['xR']:.4f}","T₂":f"{p['T2']:.2f} °C","T₃":f"{p['T3']:.2f} °C","Cp":f"{p['cp']:.3f} kJ/(kg·K)","x₄":f"{p['x4']:.4f}","λv":f"{p['lambda_v']:.2f} kJ/kg"}
-        res_pdf={"matter":{"m₁":f"{r['m1']:.2f} kg/h","m₂":f"{r['m2']:.2f} kg/h","x₂":f"{r['x2']*100:.2f} %","m₄":f"{r['m4']:.2f} kg/h","mv":f"{r['mv']:.2f} kg/h","Entrées":f"{r['feed']:.2f} kg/h","Sorties":f"{r['output']:.2f} kg/h","Écart":f"{r['error']:.6f} kg/h"},"energy":{"Q₃":f"{r['Q3']:.2f} kW","Q₄":f"{r['Q4']:.2f} kW","Q₅":f"{r['Q5']:.2f} kW"}}
-        st.download_button(t("pdf"),data=make_pdf(params_pdf,res_pdf,cs,st.session_state.get("username","User")),file_name="rapport.pdf",mime="application/pdf",use_container_width=True)
+        res_pdf={
+            "matter":{"m₁":f"{r['m1']:.2f} kg/h","m₂":f"{r['m2']:.2f} kg/h","x₂":f"{r['x2']*100:.2f} %","m₄":f"{r['m4']:.2f} kg/h","mv":f"{r['mv']:.2f} kg/h","Entrées":f"{r['feed']:.2f} kg/h","Sorties":f"{r['output']:.2f} kg/h","Écart":f"{r['error']:.6f} kg/h"},
+            "energy":{"Q₃":f"{r['Q3']:.2f} kW","Q₄":f"{r['Q4']:.2f} kW","Q₅":f"{r['Q5']:.2f} kW"},
+            "flow":[
+                ["Étape","Entrée","Sortie"],
+                ["Alimentation",f"m₀ = {p['m0']:.1f} kg/h (x₀ = {p['x0_sol']:.3f})","—"],
+                ["Filtration",f"m₀ = {p['m0']:.1f} kg/h",f"m₁ = {r['m1']:.1f} kg/h + résidus = {p['residus']:.1f} kg/h"],
+                ["Mélange + mR",f"m₁ = {r['m1']:.1f} + mR = {p['mR']:.1f} kg/h",f"m₂ = {r['m2']:.1f} kg/h"],
+                ["Chauffage",f"T₂ = {p['T2']:.0f}°C → T₃ = {p['T3']:.0f}°C",f"Q₃ = {r['Q3']:.1f} kW"],
+                ["Évaporation",f"Q₄ = {r['Q4']:.1f} kW",f"mv = {r['mv']:.1f} kg/h"],
+                ["Produit final","—",f"m₄ = {r['m4']:.1f} kg/h (x₄ = {p['x4']:.3f})"]
+            ],
+            "formulas":[
+                ["Grandeur","Formule"],
+                ["m₁ (après filtration)","m₀ − résidus"],
+                ["x₂ (concentration mélange)","(m₀·x₀ + mR·xR) / (m₀ − résidus + mR)"],
+                ["Q₃ (chauffage)","m₂ · Cp · (T₃ − T₂) / 3600"],
+                ["m₄ (produit final)","(m₀·x₀ + mR·xR) / x₄"],
+                ["mv (eau évaporée)","m₂ − m₄"],
+                ["Q₄ (évaporation)","mv · λv / 3600"],
+                ["Q₅ (refroidissement)","m₄ · Cp · 55 / 3600"]
+            ]
+        }
+        st.download_button(t("pdf"),data=make_pdf(params_pdf,res_pdf,cs,st.session_state.get("username","User"),{"p":p,"r":r}),file_name="rapport_processlab.pdf",mime="application/pdf",use_container_width=True)
+        st.caption("Le rapport contient : KPI, paramètres, bilans, schéma du procédé, formules et validation.")
     with tch:
         st.subheader(t("chat_t"))
         if not st.session_state.messages: st.session_state.messages=[{"role":"assistant","content":"Bonjour ! Je peux expliquer filtration, chauffage, évaporation et bilans."}]
@@ -408,9 +525,7 @@ def simulator():
             with st.chat_message("user"): st.markdown(pr)
             rep=bot(pr); st.session_state.messages.append({"role":"assistant","content":rep})
             with st.chat_message("assistant"): st.markdown(rep)
-    st.markdown(f"<p style='text-align:center;color:{MUT};margin-top:35px'>Simulateur Pro V2 • Génie des procédés</p>",unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center;color:{MUT};margin-top:35px'>ProcessLab • Génie des procédés</p>",unsafe_allow_html=True)
 
 # ---------- ROUTAGE ----------
 if st.session_state.logged_in and st.session_state.page=="app": simulator()
-elif st.session_state.page=="auth": auth()
-else: landing()
