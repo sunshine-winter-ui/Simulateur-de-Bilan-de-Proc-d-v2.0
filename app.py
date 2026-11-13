@@ -124,7 +124,7 @@ TRANSLATIONS = {
 }
 
 for key, value in {
-    "theme_mode": "dark", "lang": "FR", "page": "landing",
+    "theme_mode": "light", "lang": "FR", "page": "landing",
     "logged_in": False, "params": DEFAULT_PARAMS.copy()
 }.items():
     if key not in st.session_state:
@@ -182,57 +182,94 @@ def authenticate_user(email, password):
 init_db()
 
 # =========================================================
-# 3. STYLE GRAPHIQUE
+# 3. STYLE GRAPHIQUE — SOFT / COOL / ELEGANT
 # =========================================================
 is_dark = st.session_state.theme_mode == "dark"
 if is_dark:
-    BG, CARD, CARD_SOLID = "#0b1023", "rgba(255,255,255,0.055)", "#171f3a"
-    TEXT, MUTED = "#f8fafc", "#b8c2e0"
-    INPUT_BG, BORDER = "#151c34", "rgba(255,255,255,0.15)"
-    ACCENT, ACCENT2, ACCENT3 = "#8b5cf6", "#0ea5e9", "#ec4899"
-    SHADOW = "0 12px 30px rgba(0,0,0,.22)"
-    GRAD = "radial-gradient(700px at 5% 0%, #7c3aed30, transparent), radial-gradient(700px at 95% 100%, #0ea5e925, transparent)"
+    BG, CARD, CARD_SOLID = "#151B1A", "#202927", "#202927"
+    TEXT, MUTED = "#F1F5F2", "#A8B7B0"
+    INPUT_BG, BORDER = "#27322E", "#35443D"
+    ACCENT, ACCENT2, ACCENT3 = "#9CC5B1", "#7FAE9A", "#B6CFC2"
+    SHADOW, SOFT = "0 8px 28px rgba(0,0,0,.16)", "#26342E"
 else:
-    BG, CARD, CARD_SOLID = "#f3f5ff", "rgba(255,255,255,.92)", "#ffffff"
-    TEXT, MUTED = "#202447", "#596487"
-    INPUT_BG, BORDER = "#ffffff", "#dfe4f5"
-    ACCENT, ACCENT2, ACCENT3 = "#7048e8", "#167ac6", "#db4b91"
-    SHADOW = "0 12px 30px rgba(75,65,150,.10)"
-    GRAD = "radial-gradient(700px at 5% 0%, #dcd5ff, transparent), radial-gradient(700px at 95% 100%, #d6f0ff, transparent)"
+    BG, CARD, CARD_SOLID = "#F6F8F6", "#FFFFFF", "#FFFFFF"
+    TEXT, MUTED = "#25332D", "#7B8982"
+    INPUT_BG, BORDER = "#FFFFFF", "#E4EAE5"
+    ACCENT, ACCENT2, ACCENT3 = "#527C68", "#789C88", "#A8C2B2"
+    SHADOW, SOFT = "0 8px 28px rgba(39,65,50,.055)", "#EDF3EE"
 
 st.markdown(f"""
 <style>
-.stApp {{background:{BG};}}
-.stApp::before {{content:"";position:fixed;inset:0;z-index:-1;background:{GRAD};}}
-.block-container {{max-width:1250px;padding-top:2rem;padding-bottom:3rem;}}
-h1,h2,h3,h4,p,span,label {{color:{TEXT};}}
-.glass,.panel {{background:{CARD};border:1px solid {BORDER};border-radius:20px;padding:20px;box-shadow:{SHADOW};}}
-.hero {{background:linear-gradient(125deg,{ACCENT},{ACCENT2} 65%,{ACCENT3});padding:30px;border-radius:24px;margin-bottom:22px;box-shadow:{SHADOW};}}
-.hero h1,.hero p,.hero span {{color:white!important;}}
-.hero p {{margin-bottom:0;}}
-.hero-badge {{display:inline-block;background:#ffffff30;color:white!important;padding:6px 12px;border-radius:30px;font-size:12px;font-weight:700;}}
-.feature {{height:100%;background:{CARD};border:1px solid {BORDER};border-radius:18px;padding:18px;text-align:center;box-shadow:{SHADOW};}}
-.feature h3 {{font-size:18px;}}
-div[data-testid="stTextInput"] input,div[data-testid="stNumberInput"] input {{background:{INPUT_BG}!important;color:{TEXT}!important;border:1px solid {BORDER}!important;border-radius:12px!important;}}
-.stButton>button,.stFormSubmitButton>button {{background:linear-gradient(120deg,{ACCENT},{ACCENT2});color:white;border:0;border-radius:12px;padding:10px 16px;font-weight:700;}}
-.stDownloadButton>button {{background:linear-gradient(120deg,#059669,#10b981);color:white;border:0;border-radius:12px;font-weight:700;}}
-div[data-testid="stMetric"] {{background:{CARD};border:1px solid {BORDER};border-radius:16px;padding:15px;box-shadow:{SHADOW};}}
-div[data-testid="stMetricValue"] {{color:{ACCENT2};font-weight:800;}}
-button[data-baseweb="tab"] {{border-radius:12px;padding:9px 14px;}}
-button[data-baseweb="tab"][aria-selected="true"] {{background:{ACCENT};color:white;}}
-section[data-testid="stSidebar"] {{background:{CARD_SOLID};}}
-div[data-testid="stDataFrame"] {{border:1px solid {BORDER};border-radius:12px;overflow:hidden;}}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+.stApp {{background:{BG};font-family:'DM Sans',sans-serif;color:{TEXT};}}
+.block-container {{max-width:1180px;padding-top:2rem;padding-bottom:4rem;}}
+h1,h2,h3,h4 {{color:{TEXT}!important;font-family:'Manrope',sans-serif!important;letter-spacing:-.035em;}}
+h1 {{font-weight:800!important;}}
+p,label,span,li {{color:{TEXT};}}
+small,[data-testid="stCaptionContainer"] {{color:{MUTED}!important;}}
+hr {{border-color:{BORDER}!important;}}
+header[data-testid="stHeader"] {{background:transparent;}}
+section[data-testid="stSidebar"] {{background:{CARD_SOLID};border-right:1px solid {BORDER};}}
+section[data-testid="stSidebar"] .block-container {{padding-top:1.5rem;}}
+.hero,.glass,.panel,.feature {{
+  background:{CARD};border:1px solid {BORDER};border-radius:22px;
+  box-shadow:{SHADOW};
+}}
+.hero {{padding:clamp(26px,4vw,46px);margin:18px 0 24px;position:relative;overflow:hidden;}}
+.hero:after {{content:"";position:absolute;width:210px;height:210px;right:-65px;top:-90px;
+  border-radius:50%;background:{SOFT};pointer-events:none;}}
+.hero h1 {{color:{TEXT}!important;font-size:clamp(30px,4vw,44px)!important;
+  line-height:1.12;margin:14px 0 12px;max-width:760px;position:relative;z-index:1;}}
+.hero p {{color:{MUTED}!important;font-size:16px;line-height:1.7;max-width:720px;
+  margin-bottom:0;position:relative;z-index:1;}}
+.hero-badge {{display:inline-flex;background:{SOFT};color:{ACCENT}!important;
+  border:1px solid {BORDER};padding:7px 12px;border-radius:999px;font-size:11px;
+  font-weight:700;letter-spacing:.09em;}}
+.feature {{height:100%;min-height:145px;padding:22px;transition:transform .2s ease;}}
+.feature:hover {{transform:translateY(-3px);}}
+.feature h3 {{font-size:16px;margin:0 0 7px;}}
+.feature p {{color:{MUTED}!important;font-size:13px;line-height:1.6;}}
+div[data-testid="stTextInput"] input,div[data-testid="stNumberInput"] input {{
+  background:{INPUT_BG}!important;color:{TEXT}!important;border:1px solid {BORDER}!important;
+  border-radius:12px!important;min-height:44px;box-shadow:none!important;}}
+div[data-testid="stTextInput"] input:focus,div[data-testid="stNumberInput"] input:focus {{
+  border-color:{ACCENT}!important;box-shadow:0 0 0 3px {SOFT}!important;}}
+div[data-testid="stTextInput"] label,div[data-testid="stNumberInput"] label {{
+  color:{TEXT}!important;font-weight:600;font-size:13px;}}
+.stButton>button,.stFormSubmitButton>button {{
+  background:{ACCENT}!important;color:#fff!important;border:1px solid {ACCENT}!important;
+  border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;
+  box-shadow:none!important;transition:all .18s ease;}}
+.stButton>button:hover,.stFormSubmitButton>button:hover {{
+  background:#426B57!important;border-color:#426B57!important;transform:translateY(-1px);}}
+.stDownloadButton>button {{background:{SOFT}!important;color:{ACCENT}!important;
+  border:1px solid {BORDER}!important;border-radius:12px!important;min-height:44px;font-weight:700;}}
+button[data-baseweb="tab"] {{color:{MUTED}!important;font-weight:600;border-radius:10px 10px 0 0!important;padding:12px 16px!important;}}
+button[data-baseweb="tab"][aria-selected="true"] {{color:{ACCENT}!important;
+  border-bottom:2px solid {ACCENT}!important;background:transparent!important;}}
+div[data-testid="stMetric"] {{background:{CARD};border:1px solid {BORDER};
+  border-radius:17px;padding:17px 18px;box-shadow:{SHADOW};}}
+div[data-testid="stMetricLabel"] {{color:{MUTED}!important;font-size:12px;font-weight:600;}}
+div[data-testid="stMetricValue"] {{color:{ACCENT}!important;font-family:'Manrope',sans-serif;font-weight:800;}}
+div[data-testid="stDataFrame"] {{border:1px solid {BORDER};border-radius:14px;overflow:hidden;}}
+div[data-testid="stChatMessage"] {{background:{CARD};border:1px solid {BORDER};
+  border-radius:16px;padding:12px 16px;margin-bottom:10px;}}
+div[data-testid="stProgressBar"]>div>div {{background:{ACCENT}!important;border-radius:99px;}}
+div[data-testid="stAlert"] {{border-radius:14px;}}
 #MainMenu {{visibility:hidden;}} footer {{visibility:hidden;}}
 </style>
 """, unsafe_allow_html=True)
 
 def get_logo():
     return f"""
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px">
-      <div style="font-size:42px">🧪</div>
-      <div style="line-height:1.05;text-align:left">
-        <div style="font-size:28px;font-weight:900;background:linear-gradient(120deg,{ACCENT},{ACCENT2});-webkit-background-clip:text;color:transparent">Simulateur</div>
-        <div style="font-size:13px;font-weight:800;letter-spacing:5px;color:{MUTED}">PRO V2</div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px">
+      <div style="width:46px;height:46px;border-radius:15px;background:{SOFT};
+                  display:grid;place-items:center;font-size:23px">⚗️</div>
+      <div style="line-height:1.12;text-align:left">
+        <div style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;
+                    letter-spacing:-.7px;color:{TEXT}">Process<span style="color:{ACCENT}">Lab</span></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:{MUTED};
+                    margin-top:4px">SIMULATEUR DE PROCÉDÉ</div>
       </div>
     </div>
     """
@@ -508,13 +545,13 @@ def landing_page():
     st.markdown(get_logo(), unsafe_allow_html=True)
     st.markdown(
         f"""<div class="hero">
-        <span class="hero-badge">CHIMIE • GÉNIE DES PROCÉDÉS</span>
+        <span class="hero-badge">CHIMIE · GÉNIE DES PROCÉDÉS</span>
         <h1 style="font-size:34px;margin:14px 0 8px">{t('landing_title')}</h1>
         <p>{t('landing_sub')}</p>
-        <div style="margin-top:16px">
-        <span class="hero-badge">🧪 Filtration</span>
-        <span class="hero-badge">🔥 Chauffage</span>
-        <span class="hero-badge">💨 Évaporation</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;position:relative;z-index:1">
+        <span class="hero-badge">01 · Filtration</span>
+        <span class="hero-badge">02 · Chauffage</span>
+        <span class="hero-badge">03 · Évaporation</span>
         </div></div>""",
         unsafe_allow_html=True
     )
@@ -633,9 +670,9 @@ def simulator_page():
 
     st.markdown(
         f"""<div class="hero">
-        <span class="hero-badge">SIMULATEUR DE PROCÉDÉ</span>
+        <span class="hero-badge">ESPACE DE SIMULATION</span>
         <h1 style="margin:10px 0 6px">{t('sim_title')}</h1>
-        <p>{t('sim_caption')}</p></div>""",
+        <p>{t('sim_caption')}</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;position:relative;z-index:1"><span class="hero-badge">Filtration</span><span class="hero-badge">Mélange</span><span class="hero-badge">Chauffage</span><span class="hero-badge">Évaporation</span></div></div>""",
         unsafe_allow_html=True
     )
 
