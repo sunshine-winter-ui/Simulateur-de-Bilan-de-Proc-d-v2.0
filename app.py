@@ -8,7 +8,7 @@ from io import BytesIO
 from datetime import datetime
 
 st.set_page_config(
-    page_title="Simulateur Pro V2",
+    page_title="ProcessLab — Simulateur intelligent",
     layout="wide",
     page_icon="🧪",
     initial_sidebar_state="collapsed"
@@ -260,6 +260,130 @@ div[data-testid="stAlert"] {{border-radius:14px;}}
 </style>
 """, unsafe_allow_html=True)
 
+# =========================================================
+# 3 BIS. IDENTITÉ VISUELLE CRÉATIVE — COULEURS & ÉLÉMENTS FLOTTANTS
+# =========================================================
+st.markdown("""
+<style>
+/* Fond vivant avec halos colorés */
+.stApp {
+  background:
+    radial-gradient(ellipse at 8% 12%, rgba(160, 210, 197, .23), transparent 31%),
+    radial-gradient(ellipse at 92% 18%, rgba(190, 177, 235, .20), transparent 28%),
+    radial-gradient(ellipse at 82% 88%, rgba(255, 197, 155, .16), transparent 30%),
+    linear-gradient(135deg, #F8FAF8 0%, #F4F7FA 48%, #FBF7F4 100%) !important;
+  background-attachment: fixed !important;
+}
+.block-container {position:relative;z-index:1;}
+/* Couleurs plus expressives */
+:root {
+  --mint:#4F9B83;
+  --violet:#8977C7;
+  --coral:#E58C78;
+  --gold:#D7A84B;
+}
+.hero {
+  background:linear-gradient(118deg,rgba(255,255,255,.97) 0%,rgba(245,250,247,.96) 48%,rgba(247,244,253,.96) 100%) !important;
+  border:1px solid rgba(126,158,143,.23) !important;
+  box-shadow:0 18px 48px rgba(66,91,79,.09), 0 3px 10px rgba(111,103,151,.035) !important;
+}
+.hero:before {
+  content:"✧";
+  position:absolute;right:19%;top:20px;font-size:35px;color:#D7A84B;
+  opacity:.65;animation:twinkle 4s ease-in-out infinite;
+}
+.hero:after {
+  width:260px;height:260px;right:-85px;top:-110px;
+  background:radial-gradient(circle at 35% 35%,rgba(137,119,199,.19),rgba(79,155,131,.09) 58%,transparent 70%) !important;
+}
+.hero-badge {
+  background:linear-gradient(100deg,#EAF5EF,#F0EDFA) !important;
+  color:#587D70 !important;border-color:rgba(137,119,199,.16) !important;
+}
+.feature {
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(247,250,248,.96)) !important;
+  box-shadow:0 12px 30px rgba(55,82,69,.055) !important;
+}
+.feature:after {
+  content:"";position:absolute;width:90px;height:90px;right:-38px;bottom:-43px;
+  border-radius:50%;background:linear-gradient(135deg,rgba(137,119,199,.14),rgba(229,140,120,.12));
+}
+.feature:hover {box-shadow:0 17px 34px rgba(76,112,93,.11) !important;}
+div[data-testid="stMetric"] {
+  background:linear-gradient(145deg,#FFFFFF,#F5F8F7) !important;
+  border-color:rgba(113,153,132,.2) !important;
+}
+div[data-testid="stMetric"]:nth-of-type(3n+1) {border-top:3px solid #77B69D !important;}
+div[data-testid="stMetric"]:nth-of-type(3n+2) {border-top:3px solid #A99AD8 !important;}
+div[data-testid="stMetric"]:nth-of-type(3n) {border-top:3px solid #E8A28E !important;}
+.stButton>button,.stFormSubmitButton>button {
+  background:linear-gradient(110deg,#548F79,#6B9E89 58%,#8B80BC) !important;
+  border:0 !important;box-shadow:0 7px 18px rgba(83,139,116,.2) !important;
+}
+.stButton>button:hover,.stFormSubmitButton>button:hover {
+  background:linear-gradient(110deg,#477D68,#5D8E7A 58%,#7D70B0) !important;
+  box-shadow:0 10px 23px rgba(83,139,116,.27) !important;
+}
+div[data-testid="stTextInput"] input:focus,div[data-testid="stNumberInput"] input:focus {
+  border-color:#8B80BC !important;box-shadow:0 0 0 3px rgba(139,128,188,.13) !important;
+}
+/* Petits symboles scientifiques animés, décoratifs et non interactifs */
+.floating-lab-art {
+  position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+}
+.lab-symbol {
+  position:absolute;display:block;opacity:.20;user-select:none;
+  filter:drop-shadow(0 5px 9px rgba(84,111,98,.08));
+  animation:floatAround 13s ease-in-out infinite;
+}
+.lab-symbol.s1 {top:13%;left:3%;font-size:27px;color:#559B83;animation-delay:-2s;}
+.lab-symbol.s2 {top:24%;right:4%;font-size:30px;color:#8B7CC2;animation-delay:-6s;}
+.lab-symbol.s3 {top:69%;left:5%;font-size:23px;color:#D88D78;animation-delay:-9s;}
+.lab-symbol.s4 {top:79%;right:7%;font-size:28px;color:#D2A84D;animation-delay:-4s;}
+.lab-symbol.s5 {top:47%;right:2%;font-size:19px;color:#6DAB99;animation-delay:-7s;}
+.lab-symbol.s6 {top:5%;right:28%;font-size:18px;color:#9B8BCB;animation-delay:-1s;}
+.lab-orb {
+  position:absolute;width:9px;height:9px;border-radius:50%;
+  background:linear-gradient(135deg,#8CC9B0,#A99BD8);
+  box-shadow:0 0 18px rgba(137,119,199,.35);
+  animation:orbDrift 11s ease-in-out infinite;
+}
+.lab-orb.o1 {top:38%;left:12%;}
+.lab-orb.o2 {top:83%;left:43%;width:6px;height:6px;animation-delay:-5s;}
+.lab-orb.o3 {top:15%;right:15%;width:7px;height:7px;animation-delay:-3s;}
+@keyframes floatAround {
+  0%,100% {transform:translate3d(0,0,0) rotate(-8deg);}
+  50% {transform:translate3d(9px,-19px,0) rotate(10deg);}
+}
+@keyframes orbDrift {
+  0%,100% {transform:translateY(0) scale(.9);opacity:.45;}
+  50% {transform:translateY(-22px) scale(1.3);opacity:.9;}
+}
+@keyframes twinkle {
+  0%,100% {transform:scale(.8) rotate(0);opacity:.35;}
+  50% {transform:scale(1.2) rotate(18deg);opacity:.9;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-symbol,.lab-orb,.hero:before {animation:none !important;}
+}
+@media (max-width: 700px) {
+  .lab-symbol {opacity:.10;}
+  .lab-symbol.s1,.lab-symbol.s3,.lab-symbol.s5 {display:none;}
+}
+</style>
+<div class="floating-lab-art" aria-hidden="true">
+  <span class="lab-symbol s1">⚗</span>
+  <span class="lab-symbol s2">✧</span>
+  <span class="lab-symbol s3">⌬</span>
+  <span class="lab-symbol s4">❋</span>
+  <span class="lab-symbol s5">⚛</span>
+  <span class="lab-symbol s6">∿</span>
+  <i class="lab-orb o1"></i><i class="lab-orb o2"></i><i class="lab-orb o3"></i>
+</div>
+""", unsafe_allow_html=True)
+
+
 def get_logo():
     return f"""
     <div style="display:flex;align-items:center;gap:12px;padding:8px">
@@ -269,7 +393,7 @@ def get_logo():
         <div style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;
                     letter-spacing:-.7px;color:{TEXT}">Process<span style="color:{ACCENT}">Lab</span></div>
         <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:{MUTED};
-                    margin-top:4px">SIMULATEUR DE PROCÉDÉ</div>
+                    margin-top:4px">PROCESS LAB · INDUSTRIE</div>
       </div>
     </div>
     """
