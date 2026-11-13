@@ -23,15 +23,17 @@ T = {
   "m0":"Débit initial m₀ (kg/h)","x0":"Fraction x₀ (0–1)","res":"Résidus de filtration (kg/h)",
   "mR":"Débit d'apport mR (kg/h)","xR":"Fraction xR (0–1)","T2":"Température T₂ (°C)","T3":"Température T₃ (°C)",
   "cp":"Capacité thermique Cp (kJ/kg·K)","x4":"Fraction finale visée x₄ (0–1)","lam":"Chaleur latente λv (kJ/kg)",
-  "r_t":"Résultats","m_m1":"Débit après filtration","m_x2":"Concentration mélange","m_m4":"Débit final",
-  "m_mv":"Débit évaporé","m_Q3":"Puissance chauffage","m_Q4":"Puissance évaporation","m_Q5":"Puissance refroidissement",
-  "m_err":"Écart bilan","graphs":"Graphiques","obj":"Atteinte concentration cible","obj_t":"Cible",
+  "r_t":"Résultats", 
+  "m_m1":"Débit après filtration (kg/h)","m_x2":"Concentration mélange (%)","m_m4":"Débit final (kg/h)",
+  "m_mv":"Débit évaporé (kg/h)","m_Q3":"Puissance chauffage (kW)","m_Q4":"Puissance évaporation (kW)","m_Q5":"Puissance refroidissement (kW)",
+  "m_err":"Écart bilan (kg/h)","graphs":"Graphiques","obj":"Atteinte concentration cible","obj_t":"Cible",
   "concl":"Conclusion et recommandations","chat_t":"Assistant virtuel","chat_p":"Posez une question...",
   "err_fill":"Remplissez tous les champs.","err_auth":"Email ou mot de passe incorrect.","err_req":"Tous les champs requis.",
   "err_email":"Email invalide.","err_pass":"Mots de passe différents.","err_len":"Minimum 8 caractères.",
   "err_exist":"Email déjà utilisé.","succ":"Compte créé !","err_c":"Erreur de création.",
   "l_t":"Simulez votre procédé industriel","l_s":"Calculez filtration, chauffage, évaporation. Bilans, graphiques, recommandations.",
-  "cta":"Commencer","cta_l":"Se connecter","f1":"⚡ Calculs rapides","f1_d":"Résultats instantanés.",
+  "cta":"✨ Rejoignez-nous et créez votre compte","cta_l":"🔑 Déjà un compte ? Se connecter",
+  "f1":"⚡ Calculs rapides","f1_d":"Résultats instantanés.",
   "f2":"📊 Tableaux et graphiques","f2_d":"Suivez débits et puissances.","f3":"🤖 Assistant","f3_d":"Explications des calculs.",
   "f4":"📄 Rapport PDF","f4_d":"Export structuré.","how":"Comment ça marche ?","s1":"1. Créez un compte","s1_d":"Inscrivez-vous.",
   "s2":"2. Saisissez les paramètres","s2_d":"Débits, fractions, températures.","s3":"3. Consultez le rapport","s3_d":"Analysez et exportez.",
@@ -47,15 +49,17 @@ T = {
   "m0":"Initial flow m₀ (kg/h)","x0":"Fraction x₀ (0–1)","res":"Filtration residues (kg/h)","mR":"Added flow mR (kg/h)",
   "xR":"Fraction xR (0–1)","T2":"Inlet temperature T₂ (°C)","T3":"Temperature after heating T₃ (°C)",
   "cp":"Heat capacity Cp (kJ/kg·K)","x4":"Target fraction x₄ (0–1)","lam":"Latent heat λv (kJ/kg)",
-  "r_t":"Results","m_m1":"Flow after filtration","m_x2":"Mixture concentration","m_m4":"Final flow",
-  "m_mv":"Evaporated flow","m_Q3":"Heating power","m_Q4":"Evaporation power","m_Q5":"Cooling power",
-  "m_err":"Balance deviation","graphs":"Charts","obj":"Target concentration achievement","obj_t":"Target",
+  "r_t":"Results", 
+  "m_m1":"Flow after filtration (kg/h)","m_x2":"Mixture concentration (%)","m_m4":"Final flow (kg/h)",
+  "m_mv":"Evaporated flow (kg/h)","m_Q3":"Heating power (kW)","m_Q4":"Evaporation power (kW)","m_Q5":"Cooling power (kW)",
+  "m_err":"Balance deviation (kg/h)","graphs":"Charts","obj":"Target concentration achievement","obj_t":"Target",
   "concl":"Conclusion and recommendations","chat_t":"Virtual assistant","chat_p":"Ask a question...",
   "err_fill":"Fill all fields.","err_auth":"Incorrect email or password.","err_req":"All fields required.",
   "err_email":"Invalid email.","err_pass":"Passwords don't match.","err_len":"Min 8 characters.",
   "err_exist":"Email already in use.","succ":"Account created!","err_c":"Creation error.",
   "l_t":"Simulate your industrial process","l_s":"Calculate filtration, heating, evaporation. Balances, charts, recommendations.",
-  "cta":"Get started","cta_l":"Login","f1":"⚡ Fast calculations","f1_d":"Instant results.",
+  "cta":"✨ Join us and create your account","cta_l":"🔑 Already have an account? Login",
+  "f1":"⚡ Fast calculations","f1_d":"Instant results.",
   "f2":"📊 Tables and charts","f2_d":"Track flows and power.","f3":"🤖 Assistant","f3_d":"Explanations of calculations.",
   "f4":"📄 PDF report","f4_d":"Structured export.","how":"How does it work?","s1":"1. Create account","s1_d":"Sign up.",
   "s2":"2. Enter parameters","s2_d":"Flows, fractions, temperatures.","s3":"3. View report","s3_d":"Analyze and export.",
@@ -144,7 +148,7 @@ div[data-testid="stTextInput"] label,div[data-testid="stNumberInput"] label{{col
 .stButton>button, .stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(155,111,191,.32)!important;transition:all .18s ease;}}
 .stButton>button:hover, .stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(155,111,191,.45)!important;transform:translateY(-1px);}}
 
-/* ⭐ Boutons Spéciaux (Doré) sans utiliser type="primary" */
+/* ⭐ Boutons Spéciaux (Doré) */
 div[data-testid="stHorizontalBlock"] > div:nth-child(4) .stButton>button,
 div[data-testid="stForm"] button {{
     background:linear-gradient(110deg,{CG},{CC} 55%,{CL})!important;
@@ -213,7 +217,6 @@ def toggle_lang(): st.session_state.lang="EN" if st.session_state.lang=="FR" els
 def toggle_theme(): st.session_state.theme_mode="light" if st.session_state.theme_mode=="dark" else "dark"; st.rerun()
 
 def top_bar():
-    # Colonnes en nombres entiers pour compatibilité maximale
     c1,c2,c3,c4 = st.columns([4,1,1,2])
     with c1: st.markdown(logo(), unsafe_allow_html=True)
     with c2:
@@ -263,6 +266,18 @@ def concl(r,p):
     return c
 
 # ---------- PDF ----------
+def sanitize_pdf_text(text):
+    """Remplace les caractères Unicode non supportés par la police du PDF."""
+    text = str(text)
+    replacements = {
+        "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5",
+        "λ": "L", "·": "*", "²": "2", "³": "3", "•": "-", "≤": "<=", "≥": ">=",
+        "℃": "°C"
+    }
+    for k, v in replacements.items():
+        text = text.replace(k, v)
+    return text
+
 def make_pdf(params, res, conc, user, raw):
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
@@ -287,7 +302,10 @@ def make_pdf(params, res, conc, user, raw):
     S.add(ParagraphStyle(name="SCH", parent=S["BodyText"], fontName="Helvetica-Bold", fontSize=8.5, leading=11, textColor=colors.white))
     S.add(ParagraphStyle(name="SCB", parent=S["BodyText"], fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=navy))
     S.add(ParagraphStyle(name="RB", parent=S["BodyText"], fontSize=9.5, leading=14, textColor=navy, spaceAfter=5))
-    def cell(v,h=False): return Paragraph(escape(str(v)).replace("\n","<br/>"), S["SCH" if h else "SC"])
+    
+    # Ajout de la fonction de nettoyage ici
+    def cell(v,h=False): return Paragraph(escape(sanitize_pdf_text(v)).replace("\n","<br/>"), S["SCH" if h else "SC"])
+    
     def tbl(rows, widths=None, header_color=purple):
         data = [[cell(v, i==0) for v in row] for i, row in enumerate(rows)]
         tb = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT")
@@ -312,6 +330,7 @@ def make_pdf(params, res, conc, user, raw):
         cv.drawString(17*mm,10*mm,"Document généré automatiquement - Usage pédagogique")
         cv.drawRightString(w-17*mm,10*mm,f"Page {d.page}")
         cv.restoreState()
+    
     story=[
         Spacer(1,5*mm),
         Paragraph("RAPPORT DE SIMULATION", S["RT"]),
@@ -323,10 +342,12 @@ def make_pdf(params, res, conc, user, raw):
              ["Statut","Simulation valide" if abs(r["error"])<1e-6 else "Écart détecté"]],[65*mm,105*mm]),
     ]
     story.append(Spacer(1,4*mm)); story.append(Paragraph("Résultats clés", S["ST"]))
+    
+    # KPI table
     kpi = Table([
-        [cell("m₄ final",True),cell("x₂ concentration",True),cell("mv évaporé",True)],
+        [cell("m4 final",True),cell("x2 concentration",True),cell("mv évaporé",True)],
         [cell(f"{r['m4']:.1f} kg/h"),cell(f"{r['x2']*100:.1f} %"),cell(f"{r['mv']:.1f} kg/h")],
-        [cell("Q₃ chauffage",True),cell("Q₄ évaporation",True),cell("Écart bilan",True)],
+        [cell("Q3 chauffage",True),cell("Q4 évaporation",True),cell("Écart bilan",True)],
         [cell(f"{r['Q3']:.1f} kW"),cell(f"{r['Q4']:.1f} kW"),cell(f"{r['error']:.4f} kg/h")],
     ], colWidths=[56*mm]*3)
     kpi.setStyle(TableStyle([
@@ -338,6 +359,7 @@ def make_pdf(params, res, conc, user, raw):
         ("TOPPADDING",(0,0),(-1,-1),5),("BOTTOMPADDING",(0,0),(-1,-1),5),
     ]))
     story.append(kpi)
+    
     story.append(Paragraph("1. Paramètres opératoires", S["ST"]))
     story.append(tbl([["Paramètre","Valeur"]]+[[k,v] for k,v in params.items()],[85*mm,85*mm]))
     story.append(Paragraph("2. Bilan matière", S["ST"]))
@@ -351,7 +373,9 @@ def make_pdf(params, res, conc, user, raw):
         story.append(Paragraph("5. Formules utilisées", S["ST"]))
         story.append(tbl(res["formulas"], header_color=rose_gold))
     story.append(Paragraph("6. Conclusions et recommandations", S["ST"]))
-    for x in conc: story.append(Paragraph("• " + escape(str(x)), S["RB"]))
+    for x in conc: 
+        story.append(Paragraph("- " + escape(sanitize_pdf_text(x)), S["RB"]))
+        
     story.append(Paragraph("7. Validation du rapport", S["ST"]))
     sig = Table([
         [cell("Rédigé par",True),cell("Vérifié par",True),cell("Approuvé par",True)],
@@ -390,10 +414,10 @@ def landing():
     st.markdown(f'<div class="hero"><span class="hero-badge">CHIMIE · GÉNIE DES PROCÉDÉS</span><h1 style="font-size:34px;margin:14px 0 8px">{t("l_t")}</h1><p>{t("l_s")}</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;position:relative;z-index:1"><span class="hero-badge">01 · Filtration</span><span class="hero-badge">02 · Chauffage</span><span class="hero-badge">03 · Évaporation</span></div></div>',unsafe_allow_html=True)
     c1,c2=st.columns(2)
     with c1:
-        if st.button(f"🚀 {t('cta')}", key="cta_start", use_container_width=True):
+        if st.button(t("cta"), key="cta_start", use_container_width=True):
             st.session_state.auth_tab="signup"; st.session_state.page="auth"; st.rerun()
     with c2:
-        if st.button(f"🔑 {t('cta_l')}", key="cta_login", use_container_width=True):
+        if st.button(t("cta_l"), key="cta_login", use_container_width=True):
             st.session_state.auth_tab="login"; st.session_state.page="auth"; st.rerun()
     st.write("")
     for col,(a,b) in zip(st.columns(4),[(t("f1"),t("f1_d")),(t("f2"),t("f2_d")),(t("f3"),t("f3_d")),(t("f4"),t("f4_d"))]):
@@ -411,7 +435,7 @@ def auth():
         st.markdown(logo(),unsafe_allow_html=True)
         tl,ts=st.tabs([t("login_tab"),t("signup_tab")])
         with tl:
-            if st.session_state.get("auth_tab")=="signup": st.caption(f"👆 Onglet 📝 {t('signup_tab')} pour créer un compte")
+            # Les textes "👆 Onglet..." ont été supprimés ici
             with st.form("lf"):
                 e=st.text_input(t("email"),placeholder="exemple@email.com",key="lf_email")
                 p=st.text_input(t("pass"),type="password",key="lf_pass")
@@ -423,7 +447,7 @@ def auth():
                     if u: st.session_state.update(logged_in=True,username=u,page="app"); st.rerun()
                     else: st.error(t("err_auth"))
         with ts:
-            if st.session_state.get("auth_tab")=="login": st.caption(f"👆 Onglet 🔑 {t('login_tab')} pour se connecter")
+            # Les textes "👆 Onglet..." ont été supprimés ici
             with st.form("sf"):
                 u=st.text_input(t("user"),key="sf_user")
                 e=st.text_input(t("email"),placeholder="exemple@email.com",key="sf_email")
@@ -478,10 +502,13 @@ def simulator():
     with tr:
         st.subheader(t("r_t"))
         if warn: st.warning(warn)
-        M=[(t("m_m1"),f"{r['m1']:,.2f} kg/h"),(t("m_x2"),f"{r['x2']*100:.2f} %"),(t("m_m4"),f"{r['m4']:,.2f} kg/h"),(t("m_mv"),f"{r['mv']:,.2f} kg/h"),(t("m_Q3"),f"{r['Q3']:,.2f} kW"),(t("m_Q4"),f"{r['Q4']:,.2f} kW"),(t("m_Q5"),f"{r['Q5']:,.2f} kW"),(t("m_err"),f"{r['error']:,.6f} kg/h")]
+        
+        # Modification ici : Les unités ont été bougées dans les titres et les décimales réduites à 1 pour éviter les "..."
+        M=[(t("m_m1"),f"{r['m1']:.1f}"),(t("m_x2"),f"{r['x2']*100:.1f}"),(t("m_m4"),f"{r['m4']:.1f}"),(t("m_mv"),f"{r['mv']:.1f}"),(t("m_Q3"),f"{r['Q3']:.1f}"),(t("m_Q4"),f"{r['Q4']:.1f}"),(t("m_Q5"),f"{r['Q5']:.1f}"),(t("m_err"),f"{r['error']:.4f}")]
         for s in (0,4):
             for col,(l,v) in zip(st.columns(4),M[s:s+4]):
                 with col: st.metric(l,v)
+                
         st.divider(); st.markdown("### Tableau 1 — Paramètres"); st.dataframe(pd.DataFrame([["Débit initial m₀",p["m0"],"kg/h"],["Fraction x₀",p["x0_sol"],"—"],["Résidus",p["residus"],"kg/h"],["Débit mR",p["mR"],"kg/h"],["Fraction xR",p["xR"],"—"],["T₂",p["T2"],"°C"],["T₃",p["T3"],"°C"],["Cp",p["cp"],"kJ/(kg·K)"],["Fraction x₄",p["x4"],"—"],["λv",p["lambda_v"],"kJ/kg"]],columns=["Paramètre","Valeur","Unité"]),use_container_width=True,hide_index=True)
         st.markdown("### Tableau 2 — Bilan matière"); st.dataframe(pd.DataFrame([["m₀",p["m0"],"kg/h"],["Résidus",p["residus"],"kg/h"],["m₁",r["m1"],"kg/h"],["mR",p["mR"],"kg/h"],["m₂",r["m2"],"kg/h"],["x₂",r["x2"]*100,"%"],["m₄",r["m4"],"kg/h"],["mv",r["mv"],"kg/h"],["Entrées",r["feed"],"kg/h"],["Sorties",r["output"],"kg/h"],["Écart",r["error"],"kg/h"]],columns=["Grandeur","Valeur","Unité"]),use_container_width=True,hide_index=True)
         st.markdown("### Tableau 3 — Bilan énergétique"); st.dataframe(pd.DataFrame([["Q₃ chauffage",r["Q3"],"kW"],["Q₄ évaporation",r["Q4"],"kW"],["Q₅ refroidissement",r["Q5"],"kW"]],columns=["Opération","Puissance","Unité"]),use_container_width=True,hide_index=True)
