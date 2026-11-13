@@ -89,7 +89,7 @@ def auth_user(e,p):
     return r[0] if r and vp(p,r[1]) else None
 init_db()
 
-# ---------- PALETTE : VIOLET · ROSE BÉBÉ · GOLD · ROSE DORÉ ----------
+# ---------- PALETTE ----------
 dk = st.session_state.theme_mode=="dark"
 if dk:
     BG,CRD,TXT,MUT,INP,BRD="#1A1120","#251A2E","#F5EEF7","#B5A0BE","#2D2036","#3D2D47"
@@ -139,14 +139,26 @@ section[data-testid="stSidebar"]{{background:{CRD};border-right:1px solid {BRD};
 div[data-testid="stTextInput"] input,div[data-testid="stNumberInput"] input{{background:{INP}!important;color:{TXT}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;}}
 div[data-testid="stTextInput"] input:focus,div[data-testid="stNumberInput"] input:focus{{border-color:{CL}!important;box-shadow:0 0 0 3px {CL}22!important;}}
 div[data-testid="stTextInput"] label,div[data-testid="stNumberInput"] label{{color:{TXT}!important;font-weight:600;font-size:13px;}}
-/* Boutons par défaut (violet) */
-.stButton>button,.stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(155,111,191,.32)!important;transition:all .18s ease;}}
-.stButton>button:hover,.stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(155,111,191,.45)!important;transform:translateY(-1px);}}
-/* ⭐ Boutons PRIMAIRES = GOLD PULSANT (login ultra visible) */
-.stButton>button[kind="primary"]{{background:linear-gradient(110deg,{CG},{CC} 55%,{CL})!important;color:#2D1B33!important;border:0!important;font-weight:800!important;box-shadow:0 7px 18px rgba(212,162,76,.4),0 0 0 0 rgba(212,162,76,.5)!important;animation:pulseGold 2.5s ease-in-out infinite;}}
-.stButton>button[kind="primary"]:hover{{animation:none;background:linear-gradient(110deg,{CC},{CG} 55%,{CL})!important;box-shadow:0 10px 26px rgba(212,162,76,.55)!important;transform:translateY(-1px);}}
+
+/* Boutons normaux (Violet) */
+.stButton>button, .stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(155,111,191,.32)!important;transition:all .18s ease;}}
+.stButton>button:hover, .stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(155,111,191,.45)!important;transform:translateY(-1px);}}
+
+/* ⭐ Boutons Spéciaux (Doré) sans utiliser type="primary" */
+div[data-testid="stHorizontalBlock"] > div:nth-child(4) .stButton>button,
+div[data-testid="stForm"] button {{
+    background:linear-gradient(110deg,{CG},{CC} 55%,{CL})!important;
+    color:#2D1B33!important;border:0!important;font-weight:800!important;
+    box-shadow:0 7px 18px rgba(212,162,76,.4),0 0 0 0 rgba(212,162,76,.5)!important;
+    animation:pulseGold 2.5s ease-in-out infinite;
+}}
+div[data-testid="stHorizontalBlock"] > div:nth-child(4) .stButton>button:hover,
+div[data-testid="stForm"] button:hover {{
+    animation:none;background:linear-gradient(110deg,{CC},{CG} 55%,{CL})!important;
+    box-shadow:0 10px 26px rgba(212,162,76,.55)!important;transform:translateY(-1px);
+}}
+
 section[data-testid="stSidebar"] .stButton>button{{background:linear-gradient(110deg,{ACC},{CL})!important;}}
-section[data-testid="stSidebar"] .stButton>button[kind="primary"]{{background:linear-gradient(110deg,{CG},{CC})!important;color:#2D1B33!important;}}
 .stDownloadButton>button{{background:{SOFT}!important;color:{ACC}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;font-weight:700;}}
 button[data-baseweb="tab"]{{color:{MUT}!important;font-weight:600;padding:12px 16px!important;}}
 button[data-baseweb="tab"][aria-selected="true"]{{color:{ACC}!important;border-bottom:2px solid {ACC}!important;background:transparent!important;}}
@@ -160,6 +172,7 @@ div[data-testid="stDataFrame"]{{border:1px solid {BRD};border-radius:14px;overfl
 div[data-testid="stChatMessage"]{{background:{CRD};border:1px solid {BRD};border-radius:16px;padding:12px 16px;margin-bottom:10px;}}
 div[data-testid="stProgressBar"]>div>div{{background:linear-gradient(90deg,{ACC},{CL},{CG})!important;border-radius:99px;}}
 div[data-testid="stAlert"]{{border-radius:14px;}} #MainMenu{{visibility:hidden;}} footer{{visibility:hidden;}}
+
 .floating-lab-art{{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}}
 .lab-symbol{{position:absolute;display:block;user-select:none;font-weight:700;text-shadow:0 0 14px currentColor,0 6px 14px rgba(120,60,150,.18);filter:drop-shadow(0 5px 9px rgba(120,60,150,.15));animation:floatAround 14s ease-in-out infinite;will-change:transform;}}
 .lab-symbol.s1{{top:12%;left:3%;font-size:38px;color:{CM};opacity:{SYMO};animation-delay:-2s;animation-duration:13s;}}
@@ -200,15 +213,15 @@ def toggle_lang(): st.session_state.lang="EN" if st.session_state.lang=="FR" els
 def toggle_theme(): st.session_state.theme_mode="light" if st.session_state.theme_mode=="dark" else "dark"; st.rerun()
 
 def top_bar():
-    """Barre supérieure landing/auth avec bouton login ultra visible."""
-    c1,c2,c3,c4 = st.columns([3.5,1,1,1.6])
+    # Colonnes en nombres entiers pour compatibilité maximale
+    c1,c2,c3,c4 = st.columns([4,1,1,2])
     with c1: st.markdown(logo(), unsafe_allow_html=True)
     with c2:
         if st.button(t("theme"), key="tb_th", use_container_width=True): toggle_theme()
     with c3:
         if st.button(t("lang"), key="tb_lg", use_container_width=True): toggle_lang()
     with c4:
-        if st.button(f"🔑 {t('login')}", key="tb_li", use_container_width=True, type="primary"):
+        if st.button(f"🔑 {t('login')}", key="tb_li", use_container_width=True):
             st.session_state.auth_tab = "login"
             st.session_state.page = "auth"
             st.rerun()
@@ -249,7 +262,7 @@ def concl(r,p):
     if r["Q3"]>=0: c.append(f"Puissance thermique de chauffage : {r['Q3']:.2f} kW.")
     return c
 
-# ---------- PDF ENRICHI ----------
+# ---------- PDF ----------
 def make_pdf(params, res, conc, user, raw):
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
@@ -275,7 +288,6 @@ def make_pdf(params, res, conc, user, raw):
     S.add(ParagraphStyle(name="SCB", parent=S["BodyText"], fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=navy))
     S.add(ParagraphStyle(name="RB", parent=S["BodyText"], fontSize=9.5, leading=14, textColor=navy, spaceAfter=5))
     def cell(v,h=False): return Paragraph(escape(str(v)).replace("\n","<br/>"), S["SCH" if h else "SC"])
-    def cellb(v): return Paragraph(escape(str(v)), S["SCB"])
     def tbl(rows, widths=None, header_color=purple):
         data = [[cell(v, i==0) for v in row] for i, row in enumerate(rows)]
         tb = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT")
@@ -310,7 +322,6 @@ def make_pdf(params, res, conc, user, raw):
              ["Application","ProcessLab - Simulateur Pro V2"],
              ["Statut","Simulation valide" if abs(r["error"])<1e-6 else "Écart détecté"]],[65*mm,105*mm]),
     ]
-    # KPI mini-grid
     story.append(Spacer(1,4*mm)); story.append(Paragraph("Résultats clés", S["ST"]))
     kpi = Table([
         [cell("m₄ final",True),cell("x₂ concentration",True),cell("mv évaporé",True)],
@@ -382,7 +393,7 @@ def landing():
         if st.button(f"🚀 {t('cta')}", key="cta_start", use_container_width=True):
             st.session_state.auth_tab="signup"; st.session_state.page="auth"; st.rerun()
     with c2:
-        if st.button(f"🔑 {t('cta_l')}", key="cta_login", use_container_width=True, type="primary"):
+        if st.button(f"🔑 {t('cta_l')}", key="cta_login", use_container_width=True):
             st.session_state.auth_tab="login"; st.session_state.page="auth"; st.rerun()
     st.write("")
     for col,(a,b) in zip(st.columns(4),[(t("f1"),t("f1_d")),(t("f2"),t("f2_d")),(t("f3"),t("f3_d")),(t("f4"),t("f4_d"))]):
@@ -395,7 +406,7 @@ def landing():
 def auth():
     top_bar()
     if st.button(t("back"), key="back_btn"): st.session_state.page="landing"; st.rerun()
-    _,mid,_=st.columns([1,1.6,1])
+    _,mid,_=st.columns([1,2,1])
     with mid:
         st.markdown(logo(),unsafe_allow_html=True)
         tl,ts=st.tabs([t("login_tab"),t("signup_tab")])
@@ -404,7 +415,7 @@ def auth():
             with st.form("lf"):
                 e=st.text_input(t("email"),placeholder="exemple@email.com",key="lf_email")
                 p=st.text_input(t("pass"),type="password",key="lf_pass")
-                s=st.form_submit_button(t("login_b"),use_container_width=True,type="primary")
+                s=st.form_submit_button(t("login_b"),use_container_width=True)
             if s:
                 if not e or not p: st.error(t("err_fill"))
                 else:
@@ -527,5 +538,11 @@ def simulator():
             with st.chat_message("assistant"): st.markdown(rep)
     st.markdown(f"<p style='text-align:center;color:{MUT};margin-top:35px'>ProcessLab • Génie des procédés</p>",unsafe_allow_html=True)
 
-# ---------- ROUTAGE ----------
-if st.session_state.logged_in and st.session_state.page=="app": simulator()
+# ---------- ROUTAGE AVEC GESTION D'ERREUR ----------
+try:
+    if st.session_state.logged_in and st.session_state.page=="app": simulator()
+    elif st.session_state.page=="auth": auth()
+    else: landing()
+except Exception as e:
+    st.error(f"⚠️ Une erreur d'affichage est survenue : {e}")
+    st.exception(e)
