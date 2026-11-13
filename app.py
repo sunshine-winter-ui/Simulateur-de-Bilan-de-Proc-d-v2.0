@@ -77,32 +77,32 @@ def auth_user(e,p):
     return r[0] if r and vp(p,r[1]) else None
 init_db()
 
-# ---------- PALETTE THÉMÉE ----------
+# ---------- PALETTE : VIOLET · ROSE BÉBÉ · GOLD · ROSE DORÉ ----------
 dk = st.session_state.theme_mode=="dark"
 if dk:
-    BG,CRD,TXT,MUT,INP,BRD=" #131A18","#1E2724","#F2F7F3","#A8B7B0","#26332E","#354540"
-    ACC,ACC2,SOFT="#7FD9B8","#5FB89A","#26342E"
-    SH="0 8px 28px rgba(0,0,0,.35)"; SYMO=".50"
-    BGG=("radial-gradient(ellipse at 8% 12%,rgba(127,217,184,.20),transparent 32%),"
-         "radial-gradient(ellipse at 92% 18%,rgba(181,165,240,.20),transparent 30%),"
-         "radial-gradient(ellipse at 82% 88%,rgba(255,155,130,.15),transparent 32%),"
-         "linear-gradient(135deg,#0F1614 0%,#131A18 48%,#1A1520 100%)")
-    HBG="linear-gradient(118deg,rgba(32,41,39,.97) 0%,rgba(38,48,45,.96) 48%,rgba(42,36,54,.96) 100%)"
-    FBG="linear-gradient(145deg,rgba(32,41,39,.98),rgba(30,40,36,.96))"; MBG="linear-gradient(145deg,#1E2724,#18201D)"
-    CM,CL,CC,CG="#7FD9B8","#B5A5F0","#FF9B82","#F5C862"; HB="rgba(127,217,184,.22)"
-    FSH="0 12px 30px rgba(0,0,0,.30)"; FSHH="0 17px 34px rgba(127,217,184,.22)"
+    BG,CRD,TXT,MUT,INP,BRD="#1A1120","#251A2E","#F5EEF7","#B5A0BE","#2D2036","#3D2D47"
+    ACC,ACC2,SOFT="#C99FE0","#B886D0","#2A1F2E"
+    SH="0 8px 28px rgba(0,0,0,.40)"; SYMO=".55"
+    BGG=("radial-gradient(ellipse at 8% 12%,rgba(201,159,224,.22),transparent 32%),"
+         "radial-gradient(ellipse at 92% 18%,rgba(244,184,208,.20),transparent 30%),"
+         "radial-gradient(ellipse at 82% 88%,rgba(232,198,107,.16),transparent 32%),"
+         "linear-gradient(135deg,#1A1120 0%,#1E1526 48%,#241A1A 100%)")
+    HBG="linear-gradient(118deg,rgba(37,26,46,.97) 0%,rgba(42,30,52,.96) 48%,rgba(50,36,60,.96) 100%)"
+    FBG="linear-gradient(145deg,rgba(37,26,46,.98),rgba(35,24,44,.96))"; MBG="linear-gradient(145deg,#251A2E,#1E1526)"
+    CM,CL,CC,CG="#C99FE0","#F4B8D0","#E8A0BF","#E8C66B"; HB="rgba(201,159,224,.25)"
+    FSH="0 12px 30px rgba(0,0,0,.35)"; FSHH="0 17px 34px rgba(201,159,224,.28)"
 else:
-    BG,CRD,TXT,MUT,INP,BRD="#FAFAF7","#FFFFFF","#1E2D26","#6B7A72","#FFFFFF","#E4EAE5"
-    ACC,ACC2,SOFT="#2F8B6F","#4FA383","#EAF4EE"
-    SH="0 8px 28px rgba(39,65,50,.07)"; SYMO=".60"
-    BGG=("radial-gradient(ellipse at 8% 12%,rgba(127,217,184,.32),transparent 32%),"
-         "radial-gradient(ellipse at 92% 18%,rgba(181,165,240,.30),transparent 30%),"
-         "radial-gradient(ellipse at 82% 88%,rgba(255,155,130,.24),transparent 32%),"
-         "linear-gradient(135deg,#FBF9F4 0%,#EFF6F1 48%,#F4EFFB 100%)")
-    HBG="linear-gradient(118deg,rgba(255,255,255,.98),rgba(245,250,247,.97) 48%,rgba(247,244,253,.97))"
-    FBG="linear-gradient(145deg,rgba(255,255,255,.99),rgba(247,250,248,.97))"; MBG="linear-gradient(145deg,#FFFFFF,#F5F8F7)"
-    CM,CL,CC,CG="#2F8B6F","#7B68B5","#D96B52","#B8860B"; HB="rgba(47,139,111,.22)"
-    FSH="0 12px 30px rgba(55,82,69,.07)"; FSHH="0 17px 34px rgba(76,112,93,.14)"
+    BG,CRD,TXT,MUT,INP,BRD="#FDF6FA","#FFFFFF","#2D1B33","#7A6480","#FFFFFF","#EBDBEB"
+    ACC,ACC2,SOFT="#8B5A9E","#A972BE","#F5EBF5"
+    SH="0 8px 28px rgba(90,40,120,.08)"; SYMO=".65"
+    BGG=("radial-gradient(ellipse at 8% 12%,rgba(155,111,191,.28),transparent 32%),"
+         "radial-gradient(ellipse at 92% 18%,rgba(232,160,191,.28),transparent 30%),"
+         "radial-gradient(ellipse at 82% 88%,rgba(212,162,76,.22),transparent 32%),"
+         "linear-gradient(135deg,#FDF6FA 0%,#F5EFF9 48%,#FBF4E8 100%)")
+    HBG="linear-gradient(118deg,rgba(255,255,255,.98),rgba(253,246,250,.97) 48%,rgba(251,244,232,.97))"
+    FBG="linear-gradient(145deg,rgba(255,255,255,.99),rgba(253,246,250,.97))"; MBG="linear-gradient(145deg,#FFFFFF,#F9EEF5)"
+    CM,CL,CC,CG="#9B6FBF","#E8A0BF","#C97B9E","#D4A24C"; HB="rgba(155,111,191,.25)"
+    FSH="0 12px 30px rgba(90,40,120,.08)"; FSHH="0 17px 34px rgba(155,111,191,.18)"
 
 st.markdown(f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;600;800&display=swap');
@@ -127,8 +127,9 @@ section[data-testid="stSidebar"]{{background:{CRD};border-right:1px solid {BRD};
 div[data-testid="stTextInput"] input,div[data-testid="stNumberInput"] input{{background:{INP}!important;color:{TXT}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;}}
 div[data-testid="stTextInput"] input:focus,div[data-testid="stNumberInput"] input:focus{{border-color:{CL}!important;box-shadow:0 0 0 3px {CL}22!important;}}
 div[data-testid="stTextInput"] label,div[data-testid="stNumberInput"] label{{color:{TXT}!important;font-weight:600;font-size:13px;}}
-.stButton>button,.stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(83,139,116,.22)!important;transition:all .18s ease;}}
-.stButton>button:hover,.stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(83,139,116,.32)!important;transform:translateY(-1px);}}
+.stButton>button,.stFormSubmitButton>button{{background:linear-gradient(110deg,{ACC},{ACC2} 58%,{CL})!important;color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 18px;min-height:44px;font-weight:700;box-shadow:0 7px 18px rgba(155,111,191,.32)!important;transition:all .18s ease;}}
+.stButton>button:hover,.stFormSubmitButton>button:hover{{background:linear-gradient(110deg,{ACC2},{ACC} 58%,{CL}cc)!important;box-shadow:0 10px 23px rgba(155,111,191,.45)!important;transform:translateY(-1px);}}
+section[data-testid="stSidebar"] .stButton>button{{background:linear-gradient(110deg,{ACC},{CL})!important;box-shadow:0 5px 14px rgba(155,111,191,.28)!important;}}
 .stDownloadButton>button{{background:{SOFT}!important;color:{ACC}!important;border:1px solid {BRD}!important;border-radius:12px!important;min-height:44px;font-weight:700;}}
 button[data-baseweb="tab"]{{color:{MUT}!important;font-weight:600;padding:12px 16px!important;}}
 button[data-baseweb="tab"][aria-selected="true"]{{color:{ACC}!important;border-bottom:2px solid {ACC}!important;background:transparent!important;}}
@@ -140,10 +141,10 @@ div[data-testid="stMetricLabel"]{{color:{MUT}!important;font-size:12px;font-weig
 div[data-testid="stMetricValue"]{{color:{ACC}!important;font-family:'Manrope',sans-serif;font-weight:800;}}
 div[data-testid="stDataFrame"]{{border:1px solid {BRD};border-radius:14px;overflow:hidden;}}
 div[data-testid="stChatMessage"]{{background:{CRD};border:1px solid {BRD};border-radius:16px;padding:12px 16px;margin-bottom:10px;}}
-div[data-testid="stProgressBar"]>div>div{{background:{ACC}!important;border-radius:99px;}}
+div[data-testid="stProgressBar"]>div>div{{background:linear-gradient(90deg,{ACC},{CL},{CG})!important;border-radius:99px;}}
 div[data-testid="stAlert"]{{border-radius:14px;}} #MainMenu{{visibility:hidden;}} footer{{visibility:hidden;}}
 .floating-lab-art{{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}}
-.lab-symbol{{position:absolute;display:block;user-select:none;font-weight:700;text-shadow:0 0 14px currentColor,0 6px 14px rgba(84,111,98,.18);filter:drop-shadow(0 5px 9px rgba(84,111,98,.15));animation:floatAround 14s ease-in-out infinite;will-change:transform;}}
+.lab-symbol{{position:absolute;display:block;user-select:none;font-weight:700;text-shadow:0 0 14px currentColor,0 6px 14px rgba(120,60,150,.18);filter:drop-shadow(0 5px 9px rgba(120,60,150,.15));animation:floatAround 14s ease-in-out infinite;will-change:transform;}}
 .lab-symbol.s1{{top:12%;left:3%;font-size:38px;color:{CM};opacity:{SYMO};animation-delay:-2s;animation-duration:13s;}}
 .lab-symbol.s2{{top:22%;right:4%;font-size:42px;color:{CL};opacity:{SYMO};animation-delay:-6s;animation-duration:16s;}}
 .lab-symbol.s3{{top:68%;left:4%;font-size:34px;color:{CC};opacity:{SYMO};animation-delay:-9s;animation-duration:15s;}}
@@ -232,8 +233,8 @@ def make_pdf(params, res, conc, user):
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from xml.sax.saxutils import escape
     buf=BytesIO(); doc=SimpleDocTemplate(buf,pagesize=A4,rightMargin=17*mm,leftMargin=17*mm,topMargin=25*mm,bottomMargin=18*mm)
-    purple=colors.HexColor("#6941C6"); navy=colors.HexColor("#172554"); pale=colors.HexColor("#EEF2FF")
-    grey=colors.HexColor("#64748B"); S=getSampleStyleSheet()
+    purple=colors.HexColor("#8B5A9E"); navy=colors.HexColor("#2D1B33"); pale=colors.HexColor("#F5EBF5")
+    grey=colors.HexColor("#7A6480"); gold=colors.HexColor("#D4A24C"); S=getSampleStyleSheet()
     S.add(ParagraphStyle(name="RT",parent=S["Title"],fontName="Helvetica-Bold",fontSize=19,leading=23,textColor=navy,alignment=TA_CENTER,spaceAfter=5))
     S.add(ParagraphStyle(name="ST",parent=S["Heading2"],fontName="Helvetica-Bold",fontSize=12,leading=15,textColor=purple,spaceBefore=12,spaceAfter=7))
     S.add(ParagraphStyle(name="SC",parent=S["BodyText"],fontName="Helvetica",fontSize=8.5,leading=11,textColor=navy))
@@ -244,7 +245,7 @@ def make_pdf(params, res, conc, user):
         data=[[cell(v,i==0) for v in row] for i,row in enumerate(rows)]
         tb=Table(data,colWidths=w,repeatRows=1,hAlign="LEFT")
         tb.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),purple),("TEXTCOLOR",(0,0),(-1,0),colors.white),
-            ("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,pale]),("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#D8DEEA")),
+            ("ROWBACKGROUNDS",(0,1),(-1,-1),[colors.white,pale]),("GRID",(0,0),(-1,-1),0.45,colors.HexColor("#EBDBEB")),
             ("VALIGN",(0,0),(-1,-1),"MIDDLE"),("LEFTPADDING",(0,0),(-1,-1),7),("RIGHTPADDING",(0,0),(-1,-1),7),
             ("TOPPADDING",(0,0),(-1,-1),6),("BOTTOMPADDING",(0,0),(-1,-1),6)]))
         return tb
@@ -252,7 +253,7 @@ def make_pdf(params, res, conc, user):
         cv.saveState(); w,h=A4
         cv.setFillColor(purple); cv.rect(0,h-13*mm,w,13*mm,fill=1,stroke=0)
         cv.setFillColor(colors.white); cv.setFont("Helvetica-Bold",9); cv.drawString(17*mm,h-8.5*mm,"SIMULATEUR PRO V2  |  RAPPORT DE PROCÉDÉ")
-        cv.setStrokeColor(colors.HexColor("#D8DEEA")); cv.line(17*mm,13*mm,w-17*mm,13*mm)
+        cv.setStrokeColor(gold); cv.setLineWidth(0.8); cv.line(17*mm,13*mm,w-17*mm,13*mm)
         cv.setFillColor(grey); cv.setFont("Helvetica",7.5)
         cv.drawString(17*mm,8*mm,"Rapport généré automatiquement - Usage pédagogique")
         cv.drawRightString(w-17*mm,8*mm,f"Page {d.page}"); cv.restoreState()
